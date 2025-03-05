@@ -16,21 +16,26 @@
       };
 
       overlayNeovim = prev: final: {
-        neovim = import ./packages/neovim {
+        myNeovim = import ./packages/neovim {
           pkgs = final;
         };
       };
 
       pkgs = import nixpkgs {
         system = "x86_64-linux";
+	config = {
+          allowUnfree = true;
+        };
         overlays = [ overlayFlakeInputs overlayNeovim ];
       };
 
+      deps = import ./packages/dependencies { inherit pkgs; };
+
     in {
-      packages.x86_64-linux.default = pkgs.neovim;
+      packages.x86_64-linux.default = pkgs.myNeovim;
       apps.x86_64-linux.default = {
         type = "app";
-        program = "${pkgs.neovim}/bin/nvim";
+        program = "${pkgs.myNeovim}/bin/nvim";
       };
     };
 }
