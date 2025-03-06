@@ -56,6 +56,7 @@ let
     gnumake
     isort
     lldb
+    lua-language-server
     nixfmt-rfc-style
     opensslEnv
     pkg-config
