@@ -30,7 +30,6 @@ with pkgs.vimPlugins;
   neo-tree-nvim
   neotest
   noice-nvim
-  nui-nvim
   nvim-cmp
   nvim-dap
   nvim-dap-ui
