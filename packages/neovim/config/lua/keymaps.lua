@@ -4,8 +4,8 @@ local opts = { noremap = true, silent = true }
 -- buffer
 vim.keymap.set("n", "gd", vim.lsp.buf.definition, {})
 vim.keymap.set("n", "gr", vim.lsp.buf.references, {})
-vim.keymap.set("n", "<leader>c", "<nop>", { desc = "Code Actions" })
-vim.keymap.set("n", "<leader>cr", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename" }))
+vim.keymap.set("n", "<leader>a", "<nop>", { desc = "Code Actions" })
+vim.keymap.set("n", "<leader>ar", vim.lsp.buf.rename, vim.tbl_extend("force", opts, { desc = "Rename" }))
 
 -- better up/down
 vim.keymap.set({ "n", "x" }, "j", "v:count == 0 ? 'gj' : 'j'", { desc = "Down", expr = true, silent = true })
@@ -50,7 +50,7 @@ local diagnostic_goto = function(next, severity)
 	end
 end
 
-vim.keymap.set("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Line Diagnostics" })
+vim.keymap.set("n", "<leader>ad", vim.diagnostic.open_float, { desc = "Line Diagnostics" })
 vim.keymap.set("n", "]d", diagnostic_goto(true), { desc = "Next Diagnostic" })
 vim.keymap.set("n", "[d", diagnostic_goto(false), { desc = "Prev Diagnostic" })
 vim.keymap.set("n", "]e", diagnostic_goto(true, "ERROR"), { desc = "Next Error" })
