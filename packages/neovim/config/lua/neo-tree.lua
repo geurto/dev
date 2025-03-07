@@ -88,3 +88,44 @@ vim.api.nvim_create_autocmd("TermClose", {
 		end
 	end,
 })
+
+-- Keymaps
+-- Explorer NeoTree (cwd)
+vim.keymap.set("n", "<leader>fe", function()
+	require("neo-tree.command").execute({ toggle = true, dir = vim.uv and vim.uv.cwd() or vim.loop.cwd() })
+end, { desc = "Explorer NeoTree (cwd)" })
+
+-- Alias for Explorer
+vim.keymap.set("n", "<leader>e", "<leader>fe", { desc = "Explorer NeoTree (cwd)", remap = true })
+
+-- Git Explorer
+vim.keymap.set("n", "<leader>ge", function()
+	require("neo-tree.command").execute({ source = "git_status", toggle = true })
+end, { desc = "Git Explorer" })
+
+-- Buffer Explorer
+vim.keymap.set("n", "<leader>be", function()
+	require("neo-tree.command").execute({ source = "buffers", toggle = true })
+end, { desc = "Buffer Explorer" })
+
+-- Handle directory opening on startup
+vim.api.nvim_create_autocmd("BufEnter", {
+	group = vim.api.nvim_create_augroup("Neotree_start_directory", { clear = true }),
+	desc = "Start Neo-tree with directory",
+	once = true,
+	callback = function()
+		if package.loaded["neo-tree"] then
+			return
+		else
+			local stats = (vim.uv and vim.uv.fs_stat or vim.loop.fs_stat)(vim.fn.argv(0))
+			if stats and stats.type == "directory" then
+				require("neo-tree")
+			end
+		end
+	end,
+})
+
+-- Add deactivation command for when needed
+vim.api.nvim_create_user_command("NeotreeClose", function()
+	vim.cmd([[Neotree close]])
+end, {})
