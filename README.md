@@ -25,3 +25,16 @@ To run Ghostty, which needs to use nixGL, you have to specify an extra argument:
 ```bash
 nix run --extra-experimental-features "nix-command flakes" --impure github:nix-community/nixGL -- .#ghostty
 ```
+
+If you do not want to add the ``--extra-experimental-features`` every time, you can create a ``nix.conf`` file:
+```bash
+mkdir -p ~/.config/nix
+nano ~/.config/nix/nix.conf
+```
+
+And put the following content in it:
+```bash 
+ experimental-features = nix-command flakes
+```
+
+
