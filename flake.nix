@@ -14,6 +14,9 @@
     ghostty = {
       url = "github:ghostty-org/ghostty";
     };
+    nixgl = {
+      url = "github:nix-community/nixGL";
+    };
   };
   outputs =
     {
@@ -22,12 +25,14 @@
       neovim,
       flake-utils,
       ghostty,
+      nixgl,
     }:
     flake-utils.lib.eachDefaultSystem (
       system:
       let
         overlayFlakeInputs = prev: final: {
           neovim = neovim.packages.${system}.neovim;
+          nixgl = nixgl.packages.${system};
         };
 
         overlayNeovim = prev: final: {
@@ -55,17 +60,16 @@
           deps = deps.packages;
         };
 
-        # Import Ghostty configuration
-        ghosttyConfig = import ./packages/ghostty {
+        # Import Ghostty configuration with nixGL support
+        ghosttyWrapper = import ./packages/ghostty {
           inherit pkgs;
           ghostty = ghostty.packages.${system}.default;
-          neovim = pkgs.myNeovim;
         };
       in
       {
         packages = {
           default = pkgs.myNeovim;
-          ghostty = ghosttyConfig.wrapper;
+          ghostty = ghosttyWrapper;
           zsh = myZsh;
         };
         apps = {
@@ -79,8 +83,9 @@
           };
           ghostty = {
             type = "app";
-            program = "${ghosttyConfig.wrapper}/bin/ghostty-wrapper";
+            program = "${ghosttyWrapper}/bin/ghostty-wrapper";
           };
+          default = self.apps.${system}.neovim;
         };
       }
     );
