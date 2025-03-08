@@ -2,7 +2,6 @@
   pkgs,
   ghostty,
   neovim ? null,
-  nixglPackage ? null,
 }:
 
 let
@@ -40,16 +39,10 @@ let
       if command -v nixGL >/dev/null 2>&1; then
         NIXGL_BYPASS=1 exec nixGL "$0" "$@"
       else
-        # Try to use provided nixGL package
-        if [ -n "${toString nixglPackage}" ]; then
-          NIXGL_BYPASS=1 exec ${nixglPackage}/bin/nixGL "$0" "$@"
-        else
-          # Fall back to nix run
-          echo "nixGL not found, trying to run with nix run..."
-          NIXPKGS_ALLOW_UNFREE=1 NIXGL_BYPASS=1 exec nix run --impure github:nix-community/nixGL -- "$0" "$@"
-        fi
+        # Fall back to nix run
+        echo "nixGL not found in PATH, trying to run with nix run..."
+        NIXPKGS_ALLOW_UNFREE=1 NIXGL_BYPASS=1 exec nix run --impure github:nix-community/nixGL -- "$0" "$@"
       fi
-    fi    
-  '';
+    fi  '';
 in
 wrapper

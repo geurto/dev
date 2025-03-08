@@ -32,6 +32,7 @@
       let
         overlayFlakeInputs = prev: final: {
           neovim = neovim.packages.${system}.neovim;
+          nixgl = nixgl.packages.${system};
         };
 
         overlayNeovim = prev: final: {
@@ -63,8 +64,6 @@
         ghosttyWrapper = import ./packages/ghostty {
           inherit pkgs;
           ghostty = ghostty.packages.${system}.default;
-          neovim = pkgs.myNeovim;
-          nixglPackage = nixgl.packages.${system}.nixGLDefault;
         };
       in
       {
