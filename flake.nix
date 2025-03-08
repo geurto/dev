@@ -11,13 +11,17 @@
     flake-utils = {
       url = "github:numtide/flake-utils";
     };
+    ghostty = {
+      url = "github:ghostty-org/ghostty";
+    };
   };
-outputs =
+  outputs =
     {
       self,
       nixpkgs,
       neovim,
       flake-utils,
+      ghostty,
     }:
     flake-utils.lib.eachDefaultSystem (
       system:
@@ -45,48 +49,23 @@ outputs =
 
         deps = import ./packages/dependencies { inherit pkgs; };
 
-        # Create a zshrc that sets up environment variables
-        customZshrc = pkgs.writeText "zshrc" ''
-          # Set OpenSSL environment variables - this runs for every zsh instance
-          export OPENSSL_ROOT_DIR=${pkgs.openssl.dev}
-          export OPENSSL_LIBRARIES=${pkgs.openssl.out}/lib
-          export OPENSSL_INCLUDE_DIR=${pkgs.openssl.dev}/include
-          export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${pkgs.openssl.dev}/lib/pkgconfig
-          
-          # Add host system libraries to search paths
-          export NIX_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$NIX_LIBRARY_PATH
-          export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+        # Import Zsh configuration
+        myZsh = import ./packages/zsh {
+          inherit pkgs;
+          deps = deps.packages;
+        };
 
-          # Source user's zshrc if it exists
-          if [[ -f ~/.zshrc ]]; then
-            source ~/.zshrc
-          fi
-        '';
-
-        myZsh = pkgs.symlinkJoin {
-          name = "zsh-with-dependencies";
-          paths = [ pkgs.zsh ];
-          buildInputs = [ pkgs.makeWrapper ];
-          postBuild = ''
-            wrapProgram $out/bin/zsh \
-              --prefix PATH : ${pkgs.lib.makeBinPath deps.packages} \
-              --add-flags "-i" \
-              --set ZDOTDIR ${
-                pkgs.stdenv.mkDerivation {
-                  name = "zsh-dotdir";
-                  phases = [ "installPhase" ];
-                  installPhase = ''
-                    mkdir -p $out
-                    cp ${customZshrc} $out/.zshrc
-                  '';
-                }
-              }
-          '';
+        # Import Ghostty configuration
+        ghosttyConfig = import ./packages/ghostty {
+          inherit pkgs;
+          ghostty = ghostty.packages.${system}.default;
+          neovim = pkgs.myNeovim;
         };
       in
       {
         packages = {
           default = pkgs.myNeovim;
+          ghostty = ghosttyConfig.wrapper;
           zsh = myZsh;
         };
         apps = {
@@ -97,6 +76,10 @@ outputs =
           zsh = {
             type = "app";
             program = "${myZsh}/bin/zsh";
+          };
+          ghostty = {
+            type = "app";
+            program = "${ghosttyConfig.wrapper}/bin/ghostty-wrapper";
           };
         };
       }
