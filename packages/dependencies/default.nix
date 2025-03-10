@@ -52,6 +52,7 @@ let
     fzf
     gcc
     gdb
+    git
     glibc
     gnumake
     isort
@@ -59,6 +60,7 @@ let
     lua-language-server
     nixfmt-rfc-style
     opensslEnv
+    openssh
     pkg-config
     podman-compose
     prettierd
@@ -73,6 +75,7 @@ let
     tmuxPlugins.sensible
     tmuxPlugins.catppuccin
     vscode-extensions.ms-vscode.cpptools
+    wget
     xclip
     xdotool
     xorg.xhost

@@ -14,6 +14,8 @@
     ghostty = {
       url = "github:ghostty-org/ghostty";
     };
+
+    # Needed for GUI applications
     nixgl = {
       url = "github:nix-community/nixGL";
     };
@@ -30,6 +32,7 @@
     flake-utils.lib.eachDefaultSystem (
       system:
       let
+        # Overlays to change/extend nixpkgs
         overlayFlakeInputs = prev: final: {
           neovim = neovim.packages.${system}.neovim;
           nixgl = nixgl.packages.${system};
