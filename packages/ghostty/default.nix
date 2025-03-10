@@ -14,7 +14,6 @@ let
     theme = catppuccin-macchiato
     font-family = JetBrainsMono Nerd Font
     font-size = 12
-    background-opacity = 0.8
     cursor-opacity = 0.8
   '';
 
