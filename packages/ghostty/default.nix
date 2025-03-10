@@ -20,7 +20,7 @@ let
     export TERM=xterm-256color
 
     # Custom settings (only theme for now)
-    echo 'theme = catppuccin-mocha' > ~/.config/ghostty/config
+    echo 'theme = catppuccin-macchiato' > ~/.config/ghostty/config
 
     # Check if we're already running under nixGL
     if [ -n "$NIXGL_BYPASS" ]; then
