@@ -8,6 +8,16 @@ let
   # Get nixGL from pkgs
   nixGL = pkgs.nixgl.nixGLDefault;
 
+  # Custom config for Ghostty
+  ghosttyConfig = pkgs.writeText "ghostty.conf" ''
+    # Appearance
+    theme = catppuccin-macchiato
+    font-family = JetBrainsMono Nerd Font
+    font-size = 12
+    background-opacity = 0.8
+    cursor-opacity = 0.8
+  '';
+
   # Create the wrapper script
   wrapper = pkgs.writeShellScriptBin "ghostty-wrapper" ''
     #!/usr/bin/env bash
@@ -20,7 +30,8 @@ let
     export TERM=xterm-256color
 
     # Custom settings (only theme for now)
-    echo 'theme = catppuccin-macchiato' > ~/.config/ghostty/config
+    mkdir -p ~/.config/ghostty
+    cp ${ghosttyConfig} ~/.config/ghostty/config
 
     # Check if we're already running under nixGL
     if [ -n "$NIXGL_BYPASS" ]; then
