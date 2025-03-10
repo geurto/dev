@@ -44,5 +44,3 @@ vim.api.nvim_set_hl(0, "DapLogPoint", { fg = colors.blue })
 vim.api.nvim_set_hl(0, "DapStopped", { fg = colors.green })
 vim.api.nvim_set_hl(0, "DapStoppedLine", { bg = colors.surface1 })
 vim.api.nvim_set_hl(0, "DapBreakpointRejected", { fg = colors.mauve })
-
-vim.keymap.set("n", "<leader>ch", vim.lsp.buf.hover, vim.tbl_extend("force", opts, { desc = "Hover Documentation" }))

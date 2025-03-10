@@ -19,6 +19,9 @@ let
     # Set TERM for proper terminal behavior
     export TERM=xterm-256color
 
+    # Custom settings (only theme for now)
+    echo 'theme = catppuccin-mocha' > ~/.config/ghostty/config
+
     # Check if we're already running under nixGL
     if [ -n "$NIXGL_BYPASS" ]; then
       exec ${ghostty}/bin/ghostty "$@"

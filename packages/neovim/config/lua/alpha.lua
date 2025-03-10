@@ -38,7 +38,6 @@ dashboard.section.buttons.val = {
 	dashboard.button("l", "♥  lazy.nvim config", ":Lazy <CR>"),
 	dashboard.button("r", "★  Recently used files", ":Telescope oldfiles <CR>"),
 	dashboard.button("t", "⌅  Find text", ":Telescope live_grep <CR>"),
-	dashboard.button("c", "  Configuration", ":Telescope find_files cwd=~/.config/nvim <CR>"),
 	dashboard.button("q", "☚  Quit Neovim", ":qa<CR>"),
 }
 
