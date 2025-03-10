@@ -1,6 +1,63 @@
--- CPP Projects Specific
-vim.keymap.set("n", "<leader>c", "<nop>", { desc = "cpp" })
-vim.keymap.set("n", "<leader>cb", function()
+-- Function detailing how to setup debugging for your project
+local function show_cpp_debug_guide()
+	local debug_guide = [[
+C++ Debugging Guide for Neovim
+==============================
+
+Setup Steps:
+-----------
+1. Create a build directory:
+   $ mkdir -p build
+
+2. Generate build files with CMake:
+   $ cd build && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug ../
+   
+3. Build your project:
+   $ make
+
+4. Link compile_commands.json to project root (for LSP):
+   $ ln -s build/compile_commands.json .
+]]
+
+	-- Create a new floating window
+	local buf = vim.api.nvim_create_buf(false, true)
+	vim.api.nvim_buf_set_lines(buf, 0, -1, true, vim.split(debug_guide, "\n"))
+
+	-- Set buffer options
+	vim.api.nvim_buf_set_option(buf, "modifiable", false)
+	vim.api.nvim_buf_set_option(buf, "filetype", "markdown")
+
+	-- Calculate window size and position
+	local width = math.min(80, vim.o.columns - 4)
+	local height = math.min(30, vim.o.lines - 4)
+	local row = math.floor((vim.o.lines - height) / 2)
+	local col = math.floor((vim.o.columns - width) / 2)
+
+	-- Create window options
+	local opts = {
+		relative = "editor",
+		width = width,
+		height = height,
+		row = row,
+		col = col,
+		style = "minimal",
+		border = "rounded",
+	}
+
+	-- Open the window
+	local win = vim.api.nvim_open_win(buf, true, opts)
+
+	-- Set mappings to close the window
+	vim.api.nvim_buf_set_keymap(buf, "n", "q", ":close<CR>", { noremap = true, silent = true })
+	vim.api.nvim_buf_set_keymap(buf, "n", "<Esc>", ":close<CR>", { noremap = true, silent = true })
+
+	-- Set window options
+	vim.api.nvim_win_set_option(win, "winblend", 10)
+	vim.api.nvim_win_set_option(win, "cursorline", true)
+end
+
+-- function to build the local CMake project
+local function build_cmake_project()
 	-- Find the project root (assuming it contains a .git directory)
 	local root = vim.fs.find(".git", { upward = true, type = "directory" })[1]
 	if not root then
@@ -95,4 +152,9 @@ vim.keymap.set("n", "<leader>cb", function()
 	end)
 
 	print("CMake build started in the background...")
-end, { desc = "Build CMake project" })
+end
+
+-- CPP Projects Specific
+vim.keymap.set("n", "<leader>c", "<nop>", { desc = "cpp" })
+vim.keymap.set("n", "<leader>cb", build_cmake_project, { desc = "Build CMake project" })
+vim.keymap.set("n", "<leader>ch", show_cpp_debug_guide, { desc = "Show C++ debugging guide" })

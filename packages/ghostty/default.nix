@@ -11,7 +11,7 @@ let
   # Custom config for Ghostty
   ghosttyConfig = pkgs.writeText "ghostty.conf" ''
     # Appearance
-    theme = catppuccin-macchiato
+    theme = catppuccin-mocha
     font-family = JetBrainsMono Nerd Font
     font-size = 12
     cursor-opacity = 0.8
