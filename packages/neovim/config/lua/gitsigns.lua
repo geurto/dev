@@ -1,5 +1,6 @@
 require("gitsigns").setup()
 
+vim.keymap.set("n", "<leader>g", "<nop>", { desc = "gitsigns" })
 vim.keymap.set(
 	"n",
 	"<leader>ghh",
