@@ -11,19 +11,20 @@ vim.keymap.set("n", "<leader>dr", dap.repl.open, { desc = "Open REPL" })
 vim.keymap.set("n", "<leader>dl", dap.run_last, { desc = "Run Last" })
 vim.keymap.set("n", "<leader>dt", dap.terminate, { desc = "Terminate" })
 
--- Get it here: https://github.com/Microsoft/vscode-cpptools
 dap.adapters.cppdbg = {
 	id = "cppdbg",
 	type = "executable",
-	command = "/usr/local/bin/vscode-cpptools/extension/debugAdapters/bin/OpenDebugAD7",
-	env = function()
-		local variables = {}
-		for k, v in pairs(vim.fn.environ()) do
-			variables[string.format("%s", k)] = string.format("%s", v)
-		end
-		table.insert(variables, string.format("%s=%s", "TEST_VAR", "1"))
-		return variables
-	end,
+	command = vim.fn.exepath("OpenDebugAD7"),
+}
+
+dap.adapters.python = {
+	type = "executable",
+	command = vim.fn.exepath("python3.10"), -- Use exepath to find the full path to python3
+	args = { "-m", "debugpy.adapter" },
+	options = {
+		env = vim.empty_dict(), -- Use empty dict to not override any env vars
+		inherit_env = true, -- Inherit parent process environment
+	},
 }
 
 dap.adapters.lldb = {
@@ -85,12 +86,6 @@ dap.configurations.rust = {
 			},
 		},
 	},
-}
--- Configure debugpy for Python
-dap.adapters.python = {
-	type = "executable",
-	command = "python",
-	args = { "-m", "debugpy.adapter" },
 }
 
 dap.configurations.python = {
