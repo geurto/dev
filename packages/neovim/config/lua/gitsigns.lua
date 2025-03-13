@@ -3,6 +3,13 @@ require("gitsigns").setup()
 vim.keymap.set("n", "<leader>g", "<nop>", { desc = "gitsigns" })
 vim.keymap.set(
 	"n",
+	"<leader>gb",
+	":Gitsigns blame_line<CR>",
+	{ desc = "Git blame current line" },
+	{ noremap = true, silent = true }
+)
+vim.keymap.set(
+	"n",
 	"<leader>ghh",
 	":Gitsigns preview_hunk_inline<CR>",
 	{ desc = "Hunk Change Preview" },
