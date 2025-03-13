@@ -126,5 +126,8 @@ dap.configurations.python = {
 				return "/usr/bin/python"
 			end
 		end,
+		console = "integratedTerminal",
+		redirectOutput = true,
+		justmyCode = false,
 	},
 }
