@@ -64,7 +64,7 @@
         };
 
         # Import Ghostty configuration with nixGL support
-        ghosttyWrapper = import ./packages/ghostty {
+        ghosttyWithZsh = import ./packages/ghostty {
           inherit pkgs;
           ghostty = ghostty.packages.${system}.default;
         };
@@ -72,7 +72,7 @@
       {
         packages = {
           default = pkgs.myNeovim;
-          ghostty = ghosttyWrapper;
+          ghostty = ghosttyWithZsh;
           zsh = myZsh;
         };
         apps = {
@@ -86,7 +86,7 @@
           };
           ghostty = {
             type = "app";
-            program = "${ghosttyWrapper}/bin/ghostty-wrapper";
+            program = "${ghosttyWithZsh}/bin/ghostty-wrapper";
           };
           default = self.apps.${system}.neovim;
         };
