@@ -2,6 +2,7 @@
   pkgs,
   ghostty,
   neovim ? null,
+  deps ? [ ],
 }:
 
 let
@@ -15,54 +16,34 @@ let
     font-family = JetBrainsMono Nerd Font
     font-size = 12
     cursor-opacity = 0.8
+
+    # Keybindings
+    keybind = alt+j=goto_split:down
+    keybind = alt+k=goto_split:up
+    keybind = alt+h=goto_split:left
+    keybind = alt+l=goto_split:right
+    keybind = alt+shift+j=resize_split:down,10
+    keybind = alt+shift+k=resize_split:up,10
+    keybind = alt+shift+h=resize_split:left,10
+    keybind = alt+shift+l=resize_split:right,10
+    keybind = alt+shift+r=equalize_splits
   '';
 
   zshConfig = pkgs.writeText "zshrc" ''
-    # Path to oh-my-zsh installation
-    export ZSH=${pkgs.oh-my-zsh}/share/oh-my-zsh
+    # Set OpenSSL environment variables - this runs for every zsh instance
+    export OPENSSL_ROOT_DIR=${pkgs.openssl.dev}
+    export OPENSSL_LIBRARIES=${pkgs.openssl.out}/lib
+    export OPENSSL_INCLUDE_DIR=${pkgs.openssl.dev}/include
+    export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${pkgs.openssl.dev}/lib/pkgconfig
 
-    # Set theme
-    ZSH_THEME="robbyrussell"
+    # Add host system libraries to search paths
+    export NIX_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$NIX_LIBRARY_PATH
+    export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
 
-    # Add plugins
-    plugins=(git z)
-
-    # Sources 
-    source $ZSH/oh-my-zsh.sh
-
-    # Alias for neovim
-    alias nv='nix run --extra-experimental-features "nix-command flakes"  github:geurto/nix'
-
-    # Personal additions
-    # -- fzf
-    [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-    export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
-      --color=fg:#d0d0d0,fg+:#d0d0d0,bg:#121212,bg+:#262626
-      --color=hl:#5f87af,hl+:#5fd7ff,info:#afaf87,marker:#87ff00
-      --color=prompt:#d7005f,spinner:#af5fff,pointer:#af5fff,header:#87afaf
-      --color=border:#262626,label:#aeaeae,query:#d9d9d9
-      --border="rounded" --border-label="" --preview-window="border-rounded" --prompt="> "
-      --marker=">" --pointer="◆" --separator="─" --scrollbar="│"'
-
-    # -- nvm
-    export NVM_DIR="$HOME/.nvm"
-    # Lazy load nvm using a function
-    nvm() {
-      unset -f nvm
-      [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-      nvm "$@"
-    }
-
-    export PATH="$PATH:/opt/nvim-linux64/bin"
-    export CUDA_HOME=/usr/local/cuda
-    export PATH=$PATH:/usr/local/cuda/bin
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-12.6/lib64
-    export RUST_LOG=info
-
-    source ~/.config/*/cmd.sh
-
-    # -- aliases
-    alias s='source /opt/ros/*/setup.zsh && source ~/repos/*/install/setup.zsh'
+    # Source user's zshrc if it exists
+    if [[ -f ~/.zshrc ]]; then
+      source ~/.zshrc
+    fi
   '';
 
   # Create the wrapper script
@@ -102,6 +83,22 @@ let
       pkgs.oh-my-zsh
       pkgs.zsh-syntax-highlighting
     ];
+    buildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      wrapProgram $out/bin/zsh \
+        --prefix PATH : ${pkgs.lib.makeBinPath deps} \
+        --add-flags "-i" \
+        --set ZDOTDIR ${
+          pkgs.stdenv.mkDerivation {
+            name = "zsh-dotdir";
+            phases = [ "installPhase" ];
+            installPhase = ''
+              mkdir -p $out
+              cp ${zshConfig} $out/.zshrc
+            '';
+          }
+        }
+    '';
   };
 in
 ghosttyWithZsh

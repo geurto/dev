@@ -67,6 +67,7 @@
         ghosttyWithZsh = import ./packages/ghostty {
           inherit pkgs;
           ghostty = ghostty.packages.${system}.default;
+          deps = deps.packages;
         };
       in
       {
