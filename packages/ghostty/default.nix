@@ -40,6 +40,11 @@ let
     export NIX_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$NIX_LIBRARY_PATH
     export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
 
+    # Set up Go environment
+    export GOPATH=$HOME/go
+    export GOROOT="${pkgs.go}/share/go"
+    export PATH=$GOPATH/bin:$PATH
+
     # Source user's zshrc if it exists
     if [[ -f ~/.zshrc ]]; then
       source ~/.zshrc
@@ -56,6 +61,11 @@ let
 
     # Set TERM for proper terminal behavior
     export TERM=xterm-256color
+
+    # Set up Go environment in the wrapper itself
+    export GOPATH=$HOME/go
+    export GOROOT="${pkgs.go}/share/go"
+    export PATH=$PATH:${pkgs.lib.makeBinPath deps}:$GOPATH/bin
 
     # Custom settings (only theme for now)
     mkdir -p ~/.config/ghostty
