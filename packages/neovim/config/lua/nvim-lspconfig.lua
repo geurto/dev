@@ -1,6 +1,5 @@
 local lspconfig = require("lspconfig")
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
-local opts = { noremap = true, silent = true }
 
 lspconfig.clangd.setup({
 	capabilities = capabilities,
@@ -19,6 +18,20 @@ lspconfig.clangd.setup({
 	on_attach = function(client, bufnr)
 		client.server_capabilities.signatureHelpProvider = false
 	end,
+})
+lspconfig.gopls.setup({
+	capabilities = capabilities,
+	cmd = { "gopls" },
+	settings = {
+		gopls = {
+			analyses = {
+				unusedparams = true,
+				shadow = true,
+			},
+			staticcheck = true,
+			gofumpt = true,
+		},
+	},
 })
 lspconfig.lua_ls.setup({ capabilities = capabilities })
 lspconfig.pyright.setup({ capabilities = capabilities })

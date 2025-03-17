@@ -32,6 +32,7 @@ with pkgs.vimPlugins;
   noice-nvim
   nvim-cmp
   nvim-dap
+  nvim-dap-go
   nvim-dap-ui
   nvim-dap-virtual-text
   nvim-lspconfig

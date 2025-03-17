@@ -49,12 +49,17 @@ let
     cmake
     cpptools
     curl
+    delve
     fzf
     gcc
     gdb
     git
     glibc
     gnumake
+    go
+    golangci-lint
+    gopls
+    gotools
     isort
     lldb
     lua-language-server
