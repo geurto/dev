@@ -40,6 +40,42 @@ let
     export LD_LIBRARY_PATH=${spdlog}/lib:$LD_LIBRARY_PATH
   '';
 
+  # Hook for dev languages (Rust, Go, C++, Python, TypeScript)
+  devHook = ''
+    # Go
+    export GOPATH=$HOME/go
+    export GOROOT="${pkgs.go}/share/go"
+    export PATH=$GOPATH/bin:$PATH
+
+    # Rust 
+    export RUSTUP_HOME=$HOME/.rustup
+    export CARGO_HOME=$HOME/.cargo
+    export PATH=$CARGO_HOME/bin:$PATH
+
+    # C++ configuration
+    export CPLUS_INCLUDE_PATH=${pkgs.glibc.dev}/include:${pkgs.gcc}/include/c++/${pkgs.gcc.version}:$CPLUS_INCLUDE_PATH
+    export LIBRARY_PATH=${pkgs.glibc}/lib:${pkgs.gcc}/lib:$LIBRARY_PATH
+    export CPATH=${pkgs.glibc.dev}/include:${pkgs.gcc}/include/c++/${pkgs.gcc.version}:$CPATH
+
+    # Python configuration
+    export PYTHONPATH=${pythonWithDebugpy}/${pythonWithDebugpy.sitePackages}:$PYTHONPATH
+    export PYTHONUSERBASE=$HOME/.local/python
+    export PATH=$PYTHONUSERBASE/bin:$PATH
+
+    # Node.js/TypeScript configuration
+    export NPM_CONFIG_PREFIX=$HOME/.npm-global
+    export PATH=$NPM_CONFIG_PREFIX/bin:$PATH
+
+    # General development tools
+    export PATH=${pkgs.lib.makeBinPath packages}:$PATH
+
+    # Create necessary directories if they don't exist
+    mkdir -p $GOPATH/bin
+    mkdir -p $CARGO_HOME/bin
+    mkdir -p $PYTHONUSERBASE/bin
+    mkdir -p $NPM_CONFIG_PREFIX/bin
+  '';
+
   packages = [
     binutils
     black
@@ -95,5 +131,5 @@ let
 in
 {
   inherit packages;
-  shellHook = opensslHook + spdlogHook;
+  shellHook = devHook + opensslHook + spdlogHook;
 }
