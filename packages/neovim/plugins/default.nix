@@ -5,6 +5,7 @@ with pkgs.vimPlugins;
     plugins: with plugins; [
       c
       cpp
+      go
       javascript
       python
       svelte
@@ -21,7 +22,22 @@ with pkgs.vimPlugins;
   cmp_luasnip
   conform-nvim
   gitsigns-nvim
-  harpoon
+  (pkgs.vimUtils.buildVimPlugin {
+    pname = "harpoon";
+    version = "harpoon2";
+    src = pkgs.fetchFromGitHub {
+      owner = "ThePrimeagen";
+      repo = "harpoon";
+      rev = "harpoon2";
+      sha256 = "sha256-L7FvOV6KvD58BnY3no5IudiKTdgkGqhpS85RoSxtl7U=";
+    };
+    nvimSkipModule = [
+      "harpoon.data"
+      "harpoon.scratch.toggle"
+      "harpoon.config"
+      "harpoon"
+    ];
+  })
   lsp_lines-nvim
   lualine-nvim
   luasnip
