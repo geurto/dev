@@ -9,6 +9,53 @@ let
   # Get nixGL from pkgs
   nixGL = pkgs.nixgl.nixGLDefault;
 
+  # tmux dependencies
+  tmuxDeps = [
+    pkgs.tmux
+    pkgs.tmuxPlugins.sensible
+    pkgs.tmuxPlugins.yank
+  ];
+
+  tmuxConfig = pkgs.writeText "tmux.conf" ''
+    # Set prefix to Ctrl-a (or keep Ctrl-b if you prefer)
+    unbind C-b
+    set -g prefix C-a
+    bind C-a send-prefix
+
+    # Enable mouse support
+    set -g mouse on
+
+    # Start window numbering at 1
+    set -g base-index 1
+    setw -g pane-base-index 1
+
+    # Improve colors
+    set -g default-terminal "tmux-256color"
+    set -ga terminal-overrides ",xterm-256color:Tc"
+
+    # Increase scrollback buffer size
+    set -g history-limit 10000
+
+    # Customize status bar
+    set -g status-style bg=black,fg=white
+    set -g window-status-current-style bg=white,fg=black,bold
+
+    # Vim-like pane navigation
+    bind h select-pane -L
+    bind j select-pane -D
+    bind k select-pane -U
+    bind l select-pane -R
+
+    # Split panes using | and -
+    bind | split-window -h -c "#{pane_current_path}"
+    bind - split-window -v -c "#{pane_current_path}"
+    unbind '"'
+    unbind %
+
+    # Reload config file
+    bind r source-file ~/.tmux.conf \; display "Config reloaded!"
+  '';
+
   # Custom config for Ghostty
   ghosttyConfig = pkgs.writeText "ghostty.conf" ''
     # Appearance
@@ -36,9 +83,24 @@ let
     export OPENSSL_INCLUDE_DIR=${pkgs.openssl.dev}/include
     export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${pkgs.openssl.dev}/lib/pkgconfig
 
-    # Add host system libraries to search paths
-    export NIX_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$NIX_LIBRARY_PATH
-    export LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+    # Add tmux configuration
+    if [ -f ~/.tmux.conf ]; then
+      # If tmux.conf doesn't exist, create it
+      if [ ! -f ~/.tmux.conf ]; then
+        cp ${tmuxConfig} ~/.tmux.conf
+      fi
+    fi
+
+    # Optional: Add tmux aliases
+    alias t="tmux"
+    alias ta="tmux attach -t"
+    alias tls="tmux list-sessions"
+    alias tn="tmux new-session -s"
+
+    # Optional: Auto-start tmux
+    if [ -z "$TMUX" ]; then
+      tmux attach -t default || tmux new -s default
+    fi
 
     # Source user's zshrc if it exists
     if [[ -f ~/.zshrc ]]; then
@@ -62,9 +124,12 @@ let
     export GOROOT="${pkgs.go}/share/go"
     export PATH=$PATH:${pkgs.lib.makeBinPath deps}:$GOPATH/bin
 
-    # Custom settings (only theme for now)
+    # Custom ghostty settings (only theme for now)
     mkdir -p ~/.config/ghostty
     cp ${ghosttyConfig} ~/.config/ghostty/config
+
+    # Copy tmux config
+    cp ${tmuxConfig} ~/.tmux.conf
 
     # Check if we're already running under nixGL
     if [ -n "$NIXGL_BYPASS" ]; then
@@ -87,7 +152,7 @@ let
       pkgs.zsh
       pkgs.oh-my-zsh
       pkgs.zsh-syntax-highlighting
-    ];
+    ] ++ tmuxDeps;
     buildInputs = [ pkgs.makeWrapper ];
     postBuild = ''
       wrapProgram $out/bin/zsh \
