@@ -74,33 +74,18 @@ let
     keybind = alt+shift+h=resize_split:left,10
     keybind = alt+shift+l=resize_split:right,10
     keybind = alt+shift+r=equalize_splits
+
+    # Start with tmux
+    command = ${pkgs.tmux}/bin/tmux new-session -A -s default
   '';
 
   zshConfig = pkgs.writeText "zshrc" ''
+    echo "Custom zshrc loaded!" > /tmp/zsh_debug.log
     # Set OpenSSL environment variables - this runs for every zsh instance
     export OPENSSL_ROOT_DIR=${pkgs.openssl.dev}
     export OPENSSL_LIBRARIES=${pkgs.openssl.out}/lib
     export OPENSSL_INCLUDE_DIR=${pkgs.openssl.dev}/include
     export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:${pkgs.openssl.dev}/lib/pkgconfig
-
-    # Add tmux configuration
-    if [ -f ~/.tmux.conf ]; then
-      # If tmux.conf doesn't exist, create it
-      if [ ! -f ~/.tmux.conf ]; then
-        cp ${tmuxConfig} ~/.tmux.conf
-      fi
-    fi
-
-    # Optional: Add tmux aliases
-    alias t="tmux"
-    alias ta="tmux attach -t"
-    alias tls="tmux list-sessions"
-    alias tn="tmux new-session -s"
-
-    # Optional: Auto-start tmux
-    if [ -z "$TMUX" ]; then
-      tmux attach -t default || tmux new -s default
-    fi
 
     # Source user's zshrc if it exists
     if [[ -f ~/.zshrc ]]; then
