@@ -1,8 +1,37 @@
+# {
+#   description = "Minimal test flake";
+#
+#   inputs = {
+#     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+#     flake-utils.url = "github:numtide/flake-utils";
+#   };
+#
+#   outputs =
+#     {
+#       self,
+#       nixpkgs,
+#       flake-utils,
+#     }:
+#     flake-utils.lib.eachDefaultSystem (
+#       system:
+#       let
+#         pkgs = nixpkgs.legacyPackages.${system};
+#       in
+#       {
+#         devShell = pkgs.mkShell {
+#           buildInputs = with pkgs; [ git ];
+#           shellHook = ''
+#             echo "Minimal environment loaded"
+#           '';
+#         };
+#       }
+#     );
+# }
 {
-  description = "My own Neovim flake";
+  description = "geurto's development flake";
   inputs = {
     nixpkgs = {
-      url = "github:NixOS/nixpkgs";
+      url = "github:nixos/nixpkgs/nixos-unstable";
     };
     neovim = {
       url = "github:nix-community/neovim-nightly-overlay";
@@ -11,13 +40,9 @@
     flake-utils = {
       url = "github:numtide/flake-utils";
     };
-    ghostty = {
-      url = "github:ghostty-org/ghostty";
-    };
-
-    # Needed for GUI applications
-    nixgl = {
-      url = "github:nix-community/nixGL";
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
   };
   outputs =
@@ -26,8 +51,7 @@
       nixpkgs,
       neovim,
       flake-utils,
-      ghostty,
-      nixgl,
+      home-manager,
     }:
     flake-utils.lib.eachDefaultSystem (
       system:
@@ -35,7 +59,6 @@
         # Overlays to change/extend nixpkgs
         overlayFlakeInputs = prev: final: {
           neovim = neovim.packages.${system}.neovim;
-          nixgl = nixgl.packages.${system};
         };
 
         overlayNeovim = prev: final: {
@@ -56,38 +79,22 @@
         };
 
         deps = import ./packages/dependencies { inherit pkgs; };
-
-        # Import Zsh configuration
-        myZsh = import ./packages/zsh {
-          inherit pkgs;
-          deps = deps.packages;
-        };
-
-        # Import Ghostty configuration with nixGL support
-        ghosttyWithZsh = import ./packages/ghostty {
-          inherit pkgs;
-          ghostty = ghostty.packages.${system}.default;
-          deps = deps.packages;
-        };
       in
       {
+        homeConfigurations.terminal = home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          modules = [ ./home.nix ];
+        };
+
+        devShell = import ./shell.nix { inherit pkgs; };
+
         packages = {
           default = pkgs.myNeovim;
-          ghostty = ghosttyWithZsh;
-          zsh = myZsh;
         };
         apps = {
           neovim = {
             type = "app";
             program = "${pkgs.myNeovim}/bin/nvim";
-          };
-          zsh = {
-            type = "app";
-            program = "${myZsh}/bin/zsh";
-          };
-          ghostty = {
-            type = "app";
-            program = "${ghosttyWithZsh}/bin/ghostty-wrapper";
           };
           default = self.apps.${system}.neovim;
         };
