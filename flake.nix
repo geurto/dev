@@ -1,32 +1,3 @@
-# {
-#   description = "Minimal test flake";
-#
-#   inputs = {
-#     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-#     flake-utils.url = "github:numtide/flake-utils";
-#   };
-#
-#   outputs =
-#     {
-#       self,
-#       nixpkgs,
-#       flake-utils,
-#     }:
-#     flake-utils.lib.eachDefaultSystem (
-#       system:
-#       let
-#         pkgs = nixpkgs.legacyPackages.${system};
-#       in
-#       {
-#         devShell = pkgs.mkShell {
-#           buildInputs = with pkgs; [ git ];
-#           shellHook = ''
-#             echo "Minimal environment loaded"
-#           '';
-#         };
-#       }
-#     );
-# }
 {
   description = "geurto's development flake";
   inputs = {
@@ -81,11 +52,6 @@
         deps = import ./packages/dependencies { inherit pkgs; };
       in
       {
-        homeConfigurations.terminal = home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          modules = [ ./home.nix ];
-        };
-
         devShell = import ./shell.nix { inherit pkgs; };
 
         packages = {
