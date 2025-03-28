@@ -104,14 +104,13 @@ in
       [ -f ~/.config/rancli/cmd.sh ] && source ~/.config/rancli/cmd.sh
 
       # aliases
-      alias s='source /opt/ros/humble/setup.zsh && source ~/repos/ranmarine/install/setup.zsh'
-      alias nv='nix run --extra-experimental-features "nix-command flakes"  github:geurto/nix'
-      alias nx='nix --extra-experimental-features "nix-command flakes"'     
     '';
 
     shellAliases = {
       ll = "ls -la";
       vim = "nvim";
+      nv = "nix run --extra-experimental-features 'nix-command flakes'  github:geurto/nix";
+      s= "source /opt/ros/*/setup.zsh"
     };
   };
 
