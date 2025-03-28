@@ -1,0 +1,9 @@
+[env]
+TERM = "xterm-256color"
+
+[font]
+normal = { family = "JetBrainsMono Nerd Font", style = "Regular" }
+size = 10
+
+[terminal]
+shell = { program = "/home/peter/repos/personal/nix/packages/terminal/config/nix-dev-shell.sh", args = ["--login"] } 

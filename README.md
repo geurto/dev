@@ -7,12 +7,6 @@ First install nix:
 sh <(curl -L https://nixos.org/nix/install) --daemon
 ```
 
-Next, in order to use Ghostty, make sure to install nixGL:
-```bash
-nix-channel --add https://github.com/nix-community/nixGL/archive/main.tar.gz nixgl && nix-channel --update
-nix-env -iA nixgl.auto.nixGLDefault   # or replace `nixGLDefault` with your desired wrapper
-```
-
 ## Running
 
 To run neovim separately in your terminal, you can do:
@@ -32,15 +26,8 @@ And put the following content in it:
  experimental-features = nix-command flakes
 ```
 
-### ghostty
-To run Ghostty, which needs to use nixGL, you have to specify an extra argument:
-```bash
-nix run --extra-experimental-features "nix-command flakes" --impure github:nix-community/nixGL -- .#ghostty
-```
+### terminal
+The terminal environment includes some tools I find useful for using the terminal (tmux, zsh, oh-my-zsh), as well as dependencies needed to develop in a couple of languages (Rust, C++, Python, Go, TypeScript).
 
-It is quicker to install Ghostty to your nix profile:
-```bash
-NIXPKGS_ALLOW_UNFREE=1 nix profile install github:geurto/nix#ghostty
-```
-
-which then allows you to run Ghostty with ``ghostty-wrapper``. You can also create a shortcut for this (e.g. ``ALT+CTRL+G``) for easy terminal launching.
+To enter this shell, go to the root directory of this repository and run `nix develop`.
+In order to automatically load this shell environment when you open a terminal, add it to your terminal's start-up command. For alacritty, for instance, this is achieved by adding the following line to your *alacritty.toml* file:

@@ -122,15 +122,15 @@ let
     trap "rm -rf $TEMP_CONFIG_DIR" EXIT
 
     # Set up zsh configuration
-    cp ${zshConfig} $TEMP_CONFIG_DIR/zshrc
+    cp ${zshConfig} $TEMP_CONFIG_DIR/.zshrc
 
     # Set up tmux configuration
-    cp ${tmuxConfig} $TEMP_CONFIG_DIR/tmux.conf
+    cp ${tmuxConfig} $TEMP_CONFIG_DIR/.tmux.conf
 
     # Set environment variables
     export ZDOTDIR=$TEMP_CONFIG_DIR
     export TMUX_TMPDIR=$TEMP_CONFIG_DIR
-    export TMUX_CONFIG=$TEMP_CONFIG_DIR/tmux.conf
+    export TMUX_CONFIG=$TEMP_CONFIG_DIR/.tmux.conf
 
     # Create aliases for tmux to use our config
     alias tmux="tmux -f $TMUX_CONFIG"
@@ -139,7 +139,7 @@ let
     export SHELL=${pkgs.zsh}/bin/zsh
 
     # Execute zsh with our config
-    exec ${pkgs.zsh}/bin/zsh -c "source $TEMP_CONFIG_DIR/zshrc; exec zsh"
+    exec ${pkgs.zsh}/bin/zsh -c "source $TEMP_CONFIG_DIR/.zshrc; exec zsh"
   '';
 
   # Define the packages needed for the terminal environment

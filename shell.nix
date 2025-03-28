@@ -30,5 +30,10 @@ pkgs.mkShell {
 
     # Apply the terminal configuration
     ${terminal.terminalHook}
+
+    # Auto-start tmux if not already in a tmux session
+    if [ -z "$TMUX" ]; then
+      tmux new-session -A -s dev
+    fi
   '';
 }
