@@ -110,7 +110,7 @@ in
       ll = "ls -la";
       vim = "nvim";
       nv = "nix run --extra-experimental-features 'nix-command flakes'  github:geurto/nix";
-      s= "source /opt/ros/*/setup.zsh"
+      s = "source /opt/ros/*/setup.zsh";
     };
   };
 
