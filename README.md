@@ -1,5 +1,5 @@
 # Personal Nix configuration
-This is a self-contained development environment that can be run on any Linux machine. You only need to have nix installed, and nixGL set-up.
+This is a self-contained development environment that can be run on any Linux machine. 
 
 ## Dependencies
 First install nix:
@@ -7,13 +7,7 @@ First install nix:
 sh <(curl -L https://nixos.org/nix/install) --daemon
 ```
 
-Next, in order to use Ghostty, make sure to install nixGL:
-```bash
-nix-channel --add https://github.com/nix-community/nixGL/archive/main.tar.gz nixgl && nix-channel --update
-nix-env -iA nixgl.auto.nixGLDefault   # or replace `nixGLDefault` with your desired wrapper
-```
-
-## Running
+## Running neovim
 
 To run neovim separately in your terminal, you can do:
 ```bash
@@ -32,15 +26,18 @@ And put the following content in it:
  experimental-features = nix-command flakes
 ```
 
-### ghostty
-To run Ghostty, which needs to use nixGL, you have to specify an extra argument:
+## Home-manager
+The home.nix file provides configuration files for zsh (including oh-my-zsh) and tmux.
+Furthermore, a whole lot of dependencies are installed to develop with.
+
+To use this home configuration, you have to enable home-manager:
+
 ```bash
-nix run --extra-experimental-features "nix-command flakes" --impure github:nix-community/nixGL -- .#ghostty
+nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
+nix-channel --update
+nix-shell '<home-manager>' -A install
 ```
 
-It is quicker to install Ghostty to your nix profile:
-```bash
-NIXPKGS_ALLOW_UNFREE=1 nix profile install github:geurto/nix#ghostty
-```
+This should allow you to run `home-manager` commands.
 
-which then allows you to run Ghostty with ``ghostty-wrapper``. You can also create a shortcut for this (e.g. ``ALT+CTRL+G``) for easy terminal launching.
+Now, to enable the configuration in *home.nix*, run `home-manager switch --file home.nix` while in this repository's root directory. If you already have a `~/.zshrc` or `~/.config/tmux/tmux.conf`, you will get asked to rename these.
