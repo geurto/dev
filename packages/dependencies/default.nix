@@ -29,10 +29,12 @@ let
     chmod +x $out/bin/*
   '';
 
-  pythonWithPkgs = python310.withPackages (
+  pythonWithPkgs = python3.withPackages (
     ps: with ps; [
       debugpy
       pip
+      # for neovim to run
+      sphinx
     ]
   );
 

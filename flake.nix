@@ -1,32 +1,3 @@
-# {
-#   description = "Minimal test flake";
-#
-#   inputs = {
-#     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-#     flake-utils.url = "github:numtide/flake-utils";
-#   };
-#
-#   outputs =
-#     {
-#       self,
-#       nixpkgs,
-#       flake-utils,
-#     }:
-#     flake-utils.lib.eachDefaultSystem (
-#       system:
-#       let
-#         pkgs = nixpkgs.legacyPackages.${system};
-#       in
-#       {
-#         devShell = pkgs.mkShell {
-#           buildInputs = with pkgs; [ git ];
-#           shellHook = ''
-#             echo "Minimal environment loaded"
-#           '';
-#         };
-#       }
-#     );
-# }
 {
   description = "geurto's development flake";
   inputs = {
@@ -56,7 +27,6 @@
     flake-utils.lib.eachDefaultSystem (
       system:
       let
-        # Overlays to change/extend nixpkgs
         overlayFlakeInputs = prev: final: {
           neovim = neovim.packages.${system}.neovim;
         };
@@ -85,8 +55,6 @@
           inherit pkgs;
           modules = [ ./home.nix ];
         };
-
-        devShell = import ./shell.nix { inherit pkgs; };
 
         packages = {
           default = pkgs.myNeovim;
