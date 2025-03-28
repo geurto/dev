@@ -29,9 +29,10 @@ let
     chmod +x $out/bin/*
   '';
 
-  pythonWithDebugpy = python310.withPackages (
+  pythonWithPkgs = python310.withPackages (
     ps: with ps; [
       debugpy
+      pip
     ]
   );
 
@@ -58,7 +59,7 @@ let
     export CPATH=${pkgs.glibc.dev}/include:${pkgs.gcc}/include/c++/${pkgs.gcc.version}:$CPATH
 
     # Python configuration
-    export PYTHONPATH=${pythonWithDebugpy}/${pythonWithDebugpy.sitePackages}:$PYTHONPATH
+    export PYTHONPATH=${pythonWithPkgs}/${pythonWithPkgs.sitePackages}:$PYTHONPATH
     export PYTHONUSERBASE=$HOME/.local/python
     export PATH=$PYTHONUSERBASE/bin:$PATH
 
@@ -77,6 +78,7 @@ let
   '';
 
   packages = [
+    bat
     binutils
     black
     cargo-nextest
@@ -106,7 +108,7 @@ let
     podman-compose
     prettierd
     pyright
-    pythonWithDebugpy
+    pythonWithPkgs
     ripgrep
     rustup
     spdlog

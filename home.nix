@@ -7,29 +7,80 @@ let
       allowUnfree = true;
     };
   };
-  # Import your custom dependencies
   dependencies = import ./packages/dependencies/default.nix { inherit pkgs; };
 in
 {
-  # Home Manager needs a bit of information about you and the paths it should manage
   home.username = "peter";
-  home.homeDirectory = "/home/peter"; # or /Users/YOUR_USERNAME on macOS
+  home.homeDirectory = "/home/peter";
 
   # This value determines the Home Manager release that your configuration is compatible with
   home.stateVersion = "23.05";
 
-  # Let Home Manager install and manage itself
   programs.home-manager.enable = true;
 
-  # Add your custom dependencies to packages
-  home.packages =
-    dependencies.packages
-    ++ (with pkgs; [
-      # Additional packages
-      fzf
-      ripgrep
-      bat
-    ]);
+  home.packages = dependencies.packages;
+
+  # Configure alacritty
+  programs.alacritty = {
+    enable = true;
+    settings = {
+      env = {
+        "TERM" = "xterm-256color";
+      };
+
+      general = {
+        import = [
+          "~/.config/alacritty/catppuccin-mocha.toml"
+        ];
+      };
+
+      window = {
+        padding = {
+          x = 10;
+          y = 10;
+        };
+        decorations = "full";
+      };
+
+      font = {
+        normal = {
+          family = "JetBrainsMono Nerd Font";
+          style = "Regular";
+        };
+        bold = {
+          family = "JetBrainsMono Nerd Font";
+          style = "Bold";
+        };
+        italic = {
+          family = "JetBrainsMono Nerd Font";
+          style = "Italic";
+        };
+        size = 10.5;
+      };
+
+      # Set shell to your zsh from home-manager
+      terminal = {
+        shell = {
+          program = "${pkgs.zsh}/bin/zsh";
+          args = [ "-l" ];
+        };
+      };
+
+      cursor = {
+        style = "Block";
+      };
+    };
+  };
+
+  # Fetch the theme file
+  home.file.".config/alacritty/catppuccin-mocha.toml" = {
+    text = builtins.readFile (
+      builtins.fetchurl {
+        url = "https://raw.githubusercontent.com/catppuccin/alacritty/main/catppuccin-mocha.toml";
+        sha256 = "1idjbm5jim9b36235hgwgp9ab81fmbij42y7h85l4l7cqcbyz74l";
+      }
+    );
+  };
 
   # Configure zsh
   programs.zsh = {
