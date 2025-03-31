@@ -33,6 +33,7 @@ let
     ps: with ps; [
       debugpy
       pip
+      setuptools
       # for neovim to run
       sphinx
     ]
