@@ -32,7 +32,7 @@
         };
 
         overlayNeovim = prev: final: {
-          myNeovim = import ./packages/neovim {
+          myNeovim = import ./neovim/nix {
             pkgs = final;
           };
         };
@@ -48,7 +48,7 @@
           ];
         };
 
-        deps = import ./packages/dependencies { inherit pkgs; };
+        deps = import ./dependencies.nix { inherit pkgs; };
       in
       {
         homeConfigurations.terminal = home-manager.lib.homeManagerConfiguration {

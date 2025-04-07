@@ -91,6 +91,7 @@ let
     cpptools
     curl
     delve
+    devcontainer
     fzf
     gcc
     gdb

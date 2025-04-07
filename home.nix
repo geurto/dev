@@ -7,7 +7,7 @@ let
       allowUnfree = true;
     };
   };
-  dependencies = import ./packages/dependencies/default.nix { inherit pkgs; };
+  dependencies = import ./dependencies.nix { inherit pkgs; };
 in
 {
   home.username = "peter";
