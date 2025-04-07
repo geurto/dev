@@ -64,8 +64,14 @@ return {
 	{ "folke/which-key.nvim" },
 	{ "folke/todo-comments.nvim" },
 	{ "folke/trouble.nvim" },
-	{ "LintaoAmons/markview.nvim" },
-	{ "https://gitlab.com/HiPhish/lsp_lines.nvim" },
+	{
+		"OXY2DEV/markview.nvim",
+		config = function()
+			require("markview").setup({
+				-- Your markview configuration options here
+			})
+		end,
+	},
 
 	-- Language specific
 	{ "LnL7/vim-nix" },

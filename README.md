@@ -1,4 +1,4 @@
-# Personal Nix configuration
+# Personal Neovim configuration
 This is a self-contained development environment that can be run on any Linux machine. 
 
 ## Dependencies
@@ -25,19 +25,5 @@ And put the following content in it:
 ```bash 
  experimental-features = nix-command flakes
 ```
-
-## Home-manager
-The home.nix file provides configuration files for zsh (including oh-my-zsh) and tmux.
-Furthermore, a whole lot of dependencies are installed to develop with.
-
-To use this home configuration, you have to enable home-manager:
-
-```bash
-nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
-nix-channel --update
-nix-shell '<home-manager>' -A install
-```
-
-This should allow you to run `home-manager` commands.
-
-Now, to enable the configuration in *home.nix*, run `home-manager switch --file home.nix` while in this repository's root directory. If you already have a `~/.zshrc` or `~/.config/tmux/tmux.conf`, you will get asked to rename these.
+## Using Neovim in a Docker container
+One of Neovim's strengths is its portability. It is great to use for debugging inside a Docker container. For this, we assume that Neovim is installed inside the Docker container.

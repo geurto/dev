@@ -1,4 +1,5 @@
--- init.lua
+require("settings")
+
 -- Detect environment
 local is_nix = vim.fn.executable("/nix/store") == 1
 
@@ -16,23 +17,11 @@ if not is_nix then
 		})
 	end
 	vim.opt.rtp:prepend(lazypath)
-end
 
--- Load Vim script configurations
-local vimrc_path = vim.fn.stdpath("config") .. "/vimrc"
-if vim.fn.isdirectory(vimrc_path) == 1 then
-	local vimrc_files = vim.fn.glob(vimrc_path .. "/*.vim", false, true)
-	for _, file in ipairs(vimrc_files) do
-		vim.cmd("source " .. file)
-	end
+	require("lazy").setup("plugins")
 end
 
 -- Load plugin configurations
 if is_nix then
-	-- In Nix, plugins are already loaded by the Nix configuration
-	-- Just load your plugin configurations
-	require("plugins.configs")
-else
-	-- In Docker, use lazy.nvim to load plugins
-	require("plugins")
+	require("plugins.config")
 end

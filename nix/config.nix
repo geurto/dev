@@ -1,35 +1,23 @@
 { pkgs }:
 let
-  scripts2ConfigFiles =
-    dir:
-    let
-      configDir = pkgs.stdenv.mkDerivation {
-        name = "nvim-${dir}-configs";
-        # Update this path to point to the correct location
-        src = ../config/${dir};
-        installPhase = ''
-          mkdir -p $out/
-          cp ./* $out/
-        '';
-      };
-    in
-    builtins.map (file: "${configDir}/${file}") (builtins.attrNames (builtins.readDir configDir));
+  # Copy the config directory to the Nix store
+  configDir = pkgs.stdenv.mkDerivation {
+    name = "nvim-config";
+    src = ../.;
+    installPhase = ''
+      mkdir -p $out/
+      cp -r ./config/* $out/
+    '';
+  };
 
-  sourceConfigFiles =
-    files:
-    builtins.concatStringsSep "\n" (
-      builtins.map (
-        file: (if pkgs.lib.strings.hasSuffix "lua" file then "luafile" else "source") + " ${file}"
-      ) files
-    );
+  # Create a simple init.lua that loads everything
+  initLua = pkgs.writeText "init.lua" ''
+    -- Add the config directory to the runtime path
+    vim.opt.runtimepath:prepend("${configDir}")
 
-  vimrc = scripts2ConfigFiles "vimrc";
-  lua = scripts2ConfigFiles "lua";
+    -- Load init.lua from the config directory
+    dofile("${configDir}/init.lua")
+  '';
 
 in
-builtins.concatStringsSep "\n" (
-  builtins.map (configs: sourceConfigFiles configs) [
-    vimrc
-    lua
-  ]
-)
+"luafile ${initLua}"
