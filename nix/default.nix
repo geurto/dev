@@ -2,7 +2,7 @@
 let
   customRC = import ./config.nix { inherit pkgs; };
   plugins = import ./plugins.nix { inherit pkgs; };
-  dependencies = import ../../dependencies.nix { inherit pkgs; };
+  dependencies = import ../dependencies.nix { inherit pkgs; };
 
   neovimRuntimeDependencies = pkgs.symlinkJoin {
     name = "neovimRuntimeDependencies";

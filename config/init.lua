@@ -36,8 +36,3 @@ else
 	-- In Docker, use lazy.nvim to load plugins
 	require("plugins")
 end
-
--- Load the rest of your configuration
-require("settings") -- General settings
-require("keymaps") -- Key mappings
-require("autocmds") -- Autocommands

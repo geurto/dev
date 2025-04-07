@@ -11,10 +11,6 @@
     flake-utils = {
       url = "github:numtide/flake-utils";
     };
-    home-manager = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
   outputs =
     {
@@ -32,7 +28,7 @@
         };
 
         overlayNeovim = prev: final: {
-          myNeovim = import ./neovim/nix {
+          myNeovim = import ./nix {
             pkgs = final;
           };
         };
@@ -51,11 +47,6 @@
         deps = import ./dependencies.nix { inherit pkgs; };
       in
       {
-        homeConfigurations.terminal = home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          modules = [ ./home.nix ];
-        };
-
         packages = {
           default = pkgs.myNeovim;
         };
