@@ -26,6 +26,12 @@ And put the following content in it:
  experimental-features = nix-command flakes
 ```
 
+### Running neovim in a Docker container
+In order to run neovim in a Docker container for debugging, you will have to mount your entire `/nix/store` directory:
+```bash
+docker run -it --privileged --net host -v /nix/store:/nix/store -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY <DOCKER_IMAGE> zsh
+```
+
 ## Home-manager
 The home.nix file provides configuration files for zsh (including oh-my-zsh) and tmux.
 Furthermore, a whole lot of dependencies are installed to develop with.
