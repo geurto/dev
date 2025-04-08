@@ -74,10 +74,10 @@ let
     export PATH=${pkgs.lib.makeBinPath packages}:$PATH
 
     # Create necessary directories if they don't exist
-    mkdir -p $GOPATH/bin
-    mkdir -p $CARGO_HOME/bin
-    mkdir -p $PYTHONUSERBASE/bin
-    mkdir -p $NPM_CONFIG_PREFIX/bin
+    mkdir -p "$GOPATH"/bin
+    mkdir -p "$CARGO_HOME"/bin
+    mkdir -p "$PYTHONUSERBASE"/bin
+    mkdir -p "$NPM_CONFIG_PREFIX"/bin
   '';
 
   packages = [
@@ -135,6 +135,11 @@ let
   ];
 in
 {
-  inherit packages;
+  inherit
+    packages
+    opensslHook
+    spdlogHook
+    devHook
+    ;
   shellHook = devHook + opensslHook + spdlogHook;
 }
