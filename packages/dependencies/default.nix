@@ -41,6 +41,9 @@ let
 
   # Hook to ensure spdlog shared libraries are available
   spdlogHook = ''
+    export CMAKE_PREFIX_PATH=${spdlog}:$CMAKE_PREFIX_PATH
+    # For older CMake versions that don't use CMAKE_PREFIX_PATH
+    export spdlog_DIR=${spdlog}/lib  
     export LD_LIBRARY_PATH=${spdlog}/lib:$LD_LIBRARY_PATH
   '';
 

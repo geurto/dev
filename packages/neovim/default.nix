@@ -46,7 +46,7 @@ pkgs.writeShellApplication {
     ${devHook}
 
     # Add spdlog to CMAKE_PREFIX_PATH
-    export CMAKE_PREFIX_PATH=${pkgs.spdlog}/lib:''${CMAKE_PREFIX_PATH:-}
+    export CMAKE_PREFIX_PATH=${pkgs.spdlog}:''${CMAKE_PREFIX_PATH:-}
 
     # Run Neovim
     ${NeovimUnwrapped}/bin/nvim "$@"
