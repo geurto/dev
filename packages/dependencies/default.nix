@@ -85,7 +85,6 @@ let
     bat
     binutils
     black
-    blas
     cargo-nextest
     ccls
     clang-tools
@@ -105,7 +104,6 @@ let
     gotools
     isort
     lldb
-    llvmPackages_14.llvm
     lua-language-server
     nixfmt-rfc-style
     nodejs
