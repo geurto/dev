@@ -29,11 +29,9 @@ let
     chmod +x $out/bin/*
   '';
 
-  pythonWithPkgs = python3.withPackages (
+  pythonWithPkgs = python310.withPackages (
     ps: with ps; [
       debugpy
-      pip
-      setuptools
       # for neovim to run
       sphinx
     ]
@@ -87,6 +85,7 @@ let
     bat
     binutils
     black
+    blas
     cargo-nextest
     ccls
     clang-tools
@@ -106,8 +105,14 @@ let
     gotools
     isort
     lldb
+    llvmPackages_14.llvm
     lua-language-server
     nixfmt-rfc-style
+    nodejs
+    nodePackages.svelte-language-server
+    nodePackages.typescript-language-server
+    nodePackages.vscode-langservers-extracted
+    nodePackages.typescript
     opensslEnv
     openssh
     pkg-config
@@ -130,19 +135,12 @@ let
     xorg.xhost
     xsel
     zsh
-    nodejs
-    nodePackages.svelte-language-server
-    nodePackages.typescript-language-server
-    nodePackages.vscode-langservers-extracted # html, css, json, eslint
-    nodePackages.typescript
+
   ];
 in
 {
   inherit
     packages
-    opensslHook
-    spdlogHook
-    devHook
     ;
   shellHook = devHook + opensslHook + spdlogHook;
 }

@@ -20,6 +20,10 @@ in
 
   home.packages = dependencies.packages;
 
+  home.sessionVariables = {
+    LD_LIBRARY_PATH = "${pkgs.openblas}/lib:$LD_LIBRARY_PATH";
+  };
+
   # Configure alacritty
   programs.alacritty = {
     enable = true;
@@ -98,6 +102,23 @@ in
     };
 
     initExtra = ''
+      ros2_shell() {
+        # Save the current directory
+        local current_dir=$(pwd)
+        
+        # Source ROS2 setup
+        source /opt/ros/humble/setup.zsh
+        
+        # Set environment variables to use system Python for ROS2
+        export PYTHONPATH=/usr/lib/python3/dist-packages:/usr/local/lib/python3/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:$PYTHONPATH
+        export PATH=/usr/local/bin:/usr/bin:$PATH
+        export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH"
+        
+        # Return to the original directory
+        cd $current_dir
+        
+        echo "ROS2 Humble environment activated. Using system Python."
+      }
       # utility function to warn if disk space is running low
       check_disk_space() {
         local threshold=95
@@ -153,8 +174,6 @@ in
       # source environments
       [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
       [ -f ~/.config/rancli/cmd.sh ] && source ~/.config/rancli/cmd.sh
-
-      # aliases
     '';
 
     shellAliases = {
@@ -168,7 +187,7 @@ in
   # Configure tmux
   programs.tmux = {
     enable = true;
-    shortcut = "a"; # Set prefix to Ctrl-a
+    shortcut = "a";
     mouse = true;
     baseIndex = 1;
     historyLimit = 10000;
