@@ -47,3 +47,6 @@ nix-shell '<home-manager>' -A install
 This should allow you to run `home-manager` commands.
 
 Now, to enable the configuration in *home.nix*, run `home-manager switch --file home.nix` while in this repository's root directory. If you already have a `~/.zshrc` or `~/.config/tmux/tmux.conf`, you will get asked to rename these.
+
+## Dotfiles
+The `dotfiles` directory holds .envrc files to be used when developing specific applications. Currently, only a ROS2 environment is supported. To use this, put `flake.nix` and `.envrc` in your ROS2 workspace.

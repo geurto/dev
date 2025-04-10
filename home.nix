@@ -8,6 +8,14 @@ let
     };
   };
   dependencies = import ./packages/dependencies/default.nix { inherit pkgs; };
+
+  # Extract the Python environment from dependencies
+  pythonWithPkgs = pkgs.python310.withPackages (
+    ps: with ps; [
+      debugpy
+      pip
+    ]
+  );
 in
 {
   home.username = "peter";
@@ -21,8 +29,43 @@ in
   home.packages = dependencies.packages;
 
   home.sessionVariables = {
-    LD_LIBRARY_PATH = "${pkgs.openblas}/lib:$LD_LIBRARY_PATH";
+    OPENSSL_ROOT_DIR = "${pkgs.openssl.dev}";
+    OPENSSL_LIBRARIES = "${pkgs.openssl.out}/lib";
+    OPENSSL_INCLUDE_DIR = "${pkgs.openssl.dev}/include";
+
+    # spdlog variables
+    CMAKE_PREFIX_PATH = "${pkgs.spdlog}:$CMAKE_PREFIX_PATH";
+    spdlog_DIR = "${pkgs.spdlog}/lib/cmake/spdlog";
+    fmt_DIR = "${pkgs.fmt.dev}/lib/cmake/fmt";
+
+    # Development environment variables
+    CARGO_HOME = "$HOME/.cargo";
+    CPATH = "${pkgs.glibc.dev}/include:${pkgs.gcc}/include/c++/${pkgs.gcc.version}:$CPATH";
+    CPLUS_INCLUDE_PATH = "${pkgs.glibc.dev}/include:${pkgs.gcc}/include/c++/${pkgs.gcc.version}:$CPLUS_INCLUDE_PATH";
+    CUDA_HOME = "/usr/local/cuda";
+    GOPATH = "$HOME/go";
+    GOROOT = "${pkgs.go}/share/go";
+    LD_LIBRARY_PATH = "${pkgs.openblas}/lib:${pkgs.spdlog}/lib:/usr/local/cuda-12.6/lib64:$LD_LIBRARY_PATH";
+    LIBRARY_PATH = "${pkgs.glibc}/lib:${pkgs.gcc}/lib:$LIBRARY_PATH";
+    NPM_CONFIG_PREFIX = "$HOME/.npm-global";
+    PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
+    PYTHONPATH = "${pythonWithPkgs}/${pythonWithPkgs.sitePackages}:/usr/lib/python3/dist-packages:/usr/local/lib/python3/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:$PYTHONPATH";
+    PYTHONUSERBASE = "$HOME/.local/python";
+    RUSTUP_HOME = "$HOME/.rustup";
   };
+
+  # Add paths to PATH
+  home.sessionPath = [
+    "$GOPATH/bin"
+    "$CARGO_HOME/bin"
+    "$PYTHONUSERBASE/bin"
+    "$NPM_CONFIG_PREFIX/bin"
+    "/home/peter/apps/balena-cli"
+    "/opt/node/bin"
+    "/opt/nvim-linux64/bin"
+    "/usr/local/cuda/bin"
+    "${pkgs.lib.makeBinPath dependencies.packages}"
+  ];
 
   # Configure alacritty
   programs.alacritty = {
@@ -102,23 +145,6 @@ in
     };
 
     initExtra = ''
-      ros2_shell() {
-        # Save the current directory
-        local current_dir=$(pwd)
-        
-        # Source ROS2 setup
-        source /opt/ros/humble/setup.zsh
-        
-        # Set environment variables to use system Python for ROS2
-        export PYTHONPATH=/usr/lib/python3/dist-packages:/usr/local/lib/python3/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:$PYTHONPATH
-        export PATH=/usr/local/bin:/usr/bin:$PATH
-        export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH"
-        
-        # Return to the original directory
-        cd $current_dir
-        
-        echo "ROS2 Humble environment activated. Using system Python."
-      }
       # utility function to warn if disk space is running low
       check_disk_space() {
         local threshold=95
@@ -147,15 +173,6 @@ in
         tmux attach-session -t default || tmux new-session -s default
       fi
 
-      # exports
-      export PATH=$PATH:"/home/peter/apps/balena-cli"
-      export PATH=$PATH:"/opt/node/bin"
-      export PATH="$PATH:/opt/nvim-linux64/bin"
-      export CUDA_HOME=/usr/local/cuda
-      export PATH=$PATH:/usr/local/cuda/bin
-      export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-12.6/lib64
-      export RUST_LOG=info
-
       # test export
       export LOADED_NIX_ENV=true
 
@@ -174,6 +191,12 @@ in
       # source environments
       [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
       [ -f ~/.config/rancli/cmd.sh ] && source ~/.config/rancli/cmd.sh
+
+      # Create necessary directories if they don't exist
+      mkdir -p "$GOPATH"/bin
+      mkdir -p "$CARGO_HOME"/bin
+      mkdir -p "$PYTHONUSERBASE"/bin
+      mkdir -p "$NPM_CONFIG_PREFIX"/bin
     '';
 
     shellAliases = {
