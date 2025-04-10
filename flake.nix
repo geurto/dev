@@ -31,9 +31,13 @@
           neovim = neovim.packages.${system}.neovim;
         };
 
+        # switch to newer Python version to overcome Python 3.10 sphinx error
         overlayNeovim = prev: final: {
           myNeovim = import ./packages/neovim {
-            pkgs = final;
+            pkgs = final // {
+              python310 = final.python312;
+              python310Packages = final.python312Packages;
+            };
           };
         };
 

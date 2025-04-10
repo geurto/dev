@@ -32,8 +32,7 @@ let
   pythonWithPkgs = python310.withPackages (
     ps: with ps; [
       debugpy
-      # for neovim to run
-      sphinx
+      pip
     ]
   );
 
