@@ -58,29 +58,23 @@ end
 
 -- function to build the local CMake project
 local function build_cmake_project()
-	-- Find the project root (assuming it contains a .git directory)
-	local root = vim.fs.find(".git", { upward = true, type = "directory" })[1]
-	if not root then
-		print("Project root not found")
-		return
-	end
-	root = vim.fs.dirname(root)
+	local dir = vim.fn.expand("%:p:h")
 
 	-- Find all CMakeLists.txt files in the project
 	local cmake_files = vim.fs.find("CMakeLists.txt", {
-		path = root,
+		path = dir,
 		type = "file",
 		limit = math.huge,
 	})
 
 	if #cmake_files == 0 then
-		print("No CMakeLists.txt found")
+		print(
+			"No CMakeLists.txt found in "
+				.. dir
+				.. " -- please run this command in a directory containing a CMakeLists.txt file."
+		)
 		return
 	end
-
-	-- Use the deepest CMakeLists.txt file
-	local deepest_cmake = cmake_files[#cmake_files]
-	local dir = vim.fs.dirname(deepest_cmake)
 
 	-- Construct the command
 	local cmd = string.format(
