@@ -33,7 +33,7 @@
 
         # switch to newer Python version to overcome Python 3.10 sphinx error
         overlayNeovim = prev: final: {
-          myNeovim = import ./packages/neovim {
+          myNeovim = import ./nix/neovim {
             pkgs = final // {
               python310 = final.python312;
               python310Packages = final.python312Packages;
@@ -52,12 +52,12 @@
           ];
         };
 
-        deps = import ./packages/dependencies { inherit pkgs; };
+        deps = import ./nix/dependencies.nix { inherit pkgs; };
       in
       {
         homeConfigurations.terminal = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
-          modules = [ ./home.nix ];
+          modules = [ ./nix/home.nix ];
         };
 
         packages = {

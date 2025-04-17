@@ -7,7 +7,7 @@ let
       allowUnfree = true;
     };
   };
-  dependencies = import ./packages/dependencies/default.nix { inherit pkgs; };
+  dependencies = import ./dependencies.nix { inherit pkgs; };
 
   # Extract the Python environment from dependencies
   pythonWithPkgs = pkgs.python310.withPackages (
