@@ -56,6 +56,44 @@ Setup Steps:
 	vim.api.nvim_win_set_option(win, "cursorline", true)
 end
 
+-- Check if we are in a Docker container to source variables
+local function is_in_docker()
+	local docker_env = vim.fn.filereadable("/.dockerenv") == 1
+
+	local cgroup_content = vim.fn.system("cat /proc/1/cgroup 2>/dev/null | grep docker")
+	local in_cgroup = vim.fn.match(cgroup_content, "docker") >= 0
+
+	return docker_env or in_cgroup
+end
+
+-- When in a Docker container, we want to add system paths to build
+local function get_build_env()
+	local env = {}
+
+	local function get_env_as_string(name)
+		local value = vim.fn.getenv(name)
+		if value == nil then
+			return ""
+		else
+			return tostring(value)
+		end
+	end
+
+	local ld_library_path = get_env_as_string("LD_LIBRARY_PATH")
+	local library_path = get_env_as_string("LIBRARY_PATH")
+	local cplus_include_path = get_env_as_string("CPLUS_INCLUDE_PATH")
+	local c_include_path = get_env_as_string("C_INCLUDE_PATH")
+
+	env.LD_LIBRARY_PATH = "/usr/lib/x86_64-linux-gnu:" .. ld_library_path
+	env.LIBRARY_PATH = "/usr/lib/x86_64-linux-gnu:" .. library_path
+	env.CPLUS_INCLUDE_PATH = "/usr/include/x86_64-linux-gnu:/usr/include:" .. cplus_include_path
+	env.C_INCLUDE_PATH = "/usr/include/x86_64-linux-gnu:/usr/include:" .. c_include_path
+
+	print("Adding system directories to build paths")
+
+	return env
+end
+
 -- function to build the local CMake project
 local function build_cmake_project()
 	local dir = vim.fn.expand("%:p:h")
@@ -117,7 +155,10 @@ local function build_cmake_project()
 		end
 	end
 
-	local build_env = get_build_env()
+	local build_env = {}
+	if is_in_docker() then
+		build_env = get_build_env()
+	end
 
 	-- Run the command asynchronously
 	local job = vim.system({ "sh", "-c", cmd }, {
@@ -149,35 +190,6 @@ local function build_cmake_project()
 	end)
 
 	print("CMake build started in the background...")
-end
-
--- Check if we are in a Docker container to source variables
-local function is_in_docker()
-	local docker_env = vim.fn.filereadable("/.dockerenv") == 1
-
-	local cgroup_content = vim.fn.systme("cat /proc/1/cgroup 2>/dev/null | grep docker")
-	local in_cgroup = vim.fn.match(cgroup_content, "docker") >= 0
-
-	return docker_env or in_cgroup
-end
-
--- When in a Docker container, we want to add system paths to build
-local function get_build_env()
-	local env = {}
-
-	if is_in_docker() then
-		local ld_library_path = vim.fn.getenv("LD_LIBRARY_PATH") or ""
-		local library_path = vim.fn.getenv("LIBRARY_PATH") or ""
-		local cplus_include_path = vim.fn.getenv("CPLUS_INCLUDE_PATH") or ""
-		local c_include_path = vim.fn.getenv("C_INCLUDE_PATH") or ""
-
-		env.LD_LIBRARY_PATH = "/usr/lib/x86_64-linux-gnu:" .. ld_library_path
-		env.LIBRARY_PATH = "/usr/lib/x86_64-linux-gnu:" .. library_path
-		env.CPLUS_INCLUDE_PATH = "/usr/include/x86_64-linux-gnu:/usr/include:" .. cplus_include_path
-		env.C_INCLUDE_PATH = "/usr/include/x86_64-linux-gnu:/usr/include:" .. c_include_path
-
-		print("Docker environment detected: Adding system directories to build paths")
-	end
 end
 
 -- CPP Projects Specific
