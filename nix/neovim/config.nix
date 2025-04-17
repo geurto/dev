@@ -5,7 +5,7 @@ let
     let
       configDir = pkgs.stdenv.mkDerivation {
         name = "nvim-${dir}-configs";
-        src = ../../neovim/config/${dir};
+        src = ../../neovim/lua/${dir};
         installPhase = ''
           mkdir -p $out/
           cp ./* $out/
@@ -22,13 +22,13 @@ let
       ) files
     );
 
-  vimrc = scripts2ConfigFiles "vimrc";
-  lua = scripts2ConfigFiles "lua";
+  config = scripts2ConfigFiles "config";
+  plugins = scripts2ConfigFiles "plugins";
 
 in
 builtins.concatStringsSep "\n" (
   builtins.map (configs: sourceConfigFiles configs) [
-    vimrc
-    lua
+    config
+    plugins
   ]
 )
