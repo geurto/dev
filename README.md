@@ -31,6 +31,12 @@ In order to run neovim in a Docker container for debugging, you will have to mou
 ```bash
 docker run -it --privileged --net host -v /nix/store:/nix/store -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY <DOCKER_IMAGE> zsh
 ```
+Now you can run neovim by specifying the nix store path. If you installed neovim to your nix profile, you can make things easier for yourself by also mounting your nix profile:
+```bash
+
+docker run -it --privileged --net host -v ~/.nix-profile:/nix-profile -v /nix/store:/nix/store -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=$DISPLAY <DOCKER_IMAGE> zsh
+```
+This way, you can run neovim with `/nix-profile/bin/nvim`.
 
 ## Home-manager
 The home.nix file provides configuration files for zsh (including oh-my-zsh) and tmux.
