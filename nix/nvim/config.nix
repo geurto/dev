@@ -5,7 +5,7 @@ let
     let
       configDir = pkgs.stdenv.mkDerivation {
         name = "nvim-${dir}-configs";
-        src = ../../neovim/lua/${dir};
+        src = ../../nvim/lua/${dir};
         installPhase = ''
           mkdir -p $out/
           cp ./* $out/

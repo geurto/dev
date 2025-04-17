@@ -8,7 +8,7 @@ local function setup_catppuccin()
 
 	-- Configure Catppuccin with explicit settings
 	catppuccin.setup({
-		flavour = "macchiato", -- latte, frappe, macchiato, mocha
+		flavour = "mocha", -- latte, frappe, macchiato, mocha
 		background = { -- :h background
 			light = "latte",
 			dark = "mocha",
