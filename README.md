@@ -11,7 +11,7 @@ sh <(curl -L https://nixos.org/nix/install) --daemon
 
 To run neovim separately in your terminal, you can do:
 ```bash
-nix run --extra-experimental-features "nix-command flakes"  github:geurto/nix
+nix run --extra-experimental-features "nix-command flakes"  github:geurto/dev
 ```
 It is worth creating an alias for this.
 
@@ -29,7 +29,7 @@ And put the following content in it:
 ### Running neovim in a Docker container
 In order to run neovim in a Docker container for debugging, you can mount the `nvim` directory (assuming the docker image has neovim installed):
 ```bash
-docker run -it --privileged --net host -v nvim/ /root/.config/nvim/ <DOCKER_IMAGE> zsh
+docker run -it --privileged --net host -v <DEV_ROOT>/nvim/:/root/.config/nvim/ -v /usr/bin/nvim:/usr/bin/nvim <DOCKER_IMAGE> bash
 ```
 
 ## Terminal tools
