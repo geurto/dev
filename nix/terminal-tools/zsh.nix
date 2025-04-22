@@ -26,14 +26,6 @@ let
       }
       check_disk_space
 
-      # NVM
-      export NVM_DIR="$HOME/.nvm"
-      nvm() {
-          unset -f nvm
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-          nvm "$@"
-      }
-
       # docker container output to screen
       xhost +local:docker > /dev/null 2>&1 || true
 
@@ -42,36 +34,18 @@ let
         tmux attach-session -t default || tmux new-session -s default
       fi
 
-      # test export
-      export LOADED_NIX_ENV=true
+      # run FZF setup if available
+      if [ -x "$(command -v fzf-setup)" ]; then
+        fzf-setup >/dev/null 2>&1
+      fi
 
-      # fzf config
+      # source FZF configuration
       [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-      # fzf colors
-      export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
-        --color=fg:#cdd6f4,fg+:#b4befe,bg:#1e1e2e,bg+:#262626
-        --color=hl:#89b4fa,hl+:#89dceb,info:#afaf87,marker:#a6e3a1
-        --color=prompt:#94e2d5,spinner:#f9e2af,pointer:#cba6f7,header:#87afaf
-        --color=border:#7f849c,label:#aeaeae,query:#d9d9d9
-        --border="rounded" --border-label="" --preview-window="border-rounded" --prompt="> "
-        --marker=">" --pointer="◆" --separator="─" --scrollbar="│"'
-
-      # source environments
-      [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
-      [ -f ~/.config/rancli/cmd.sh ] && source ~/.config/rancli/cmd.sh
-
-      # Create necessary directories if they don't exist
-      mkdir -p "$GOPATH"/bin
-      mkdir -p "$CARGO_HOME"/bin
-      mkdir -p "$PYTHONUSERBASE"/bin
-      mkdir -p "$NPM_CONFIG_PREFIX"/bin
-
-      # Aliases
-      alias ll="ls -la"
-      alias vim="nvim"
-      alias nv="nix run --extra-experimental-features 'nix-command flakes'  github:geurto/nix"
-      alias s="source /opt/ros/*/setup.zsh"
+      # source user's .zshrc if it exists
+      if [[ -f ~/.zshrc ]]; then
+        source ~/.zshrc
+      fi
     '';
   };
 

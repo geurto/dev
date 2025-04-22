@@ -23,7 +23,7 @@ import = ["~/.config/alacritty/catppuccin-mocha.toml"]
 
 [terminal.shell]
 args = ["-l"]
-program = "~/.nix-profile/bin/zsh"
+program = "/home/peter/.nix-profile/bin/zsh"
 
 [window]
 decorations = "full"
