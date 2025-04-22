@@ -1,0 +1,33 @@
+[cursor]
+style = "Block"
+
+[env]
+TERM = "xterm-256color"
+
+[font]
+size = 10.5
+[font.bold]
+family = "JetBrainsMono Nerd Font"
+style = "Bold"
+
+[font.italic]
+family = "JetBrainsMono Nerd Font"
+style = "Italic"
+
+[font.normal]
+family = "JetBrainsMono Nerd Font"
+style = "Regular"
+
+[general]
+import = ["~/.config/alacritty/catppuccin-mocha.toml"]
+
+[terminal.shell]
+args = ["-l"]
+program = "~/.nix-profile/bin/zsh"
+
+[window]
+decorations = "full"
+
+[window.padding]
+x = 10
+y = 10

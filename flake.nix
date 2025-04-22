@@ -11,10 +11,6 @@
     flake-utils = {
       url = "github:numtide/flake-utils";
     };
-    home-manager = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
   outputs =
     {
@@ -22,7 +18,6 @@
       nixpkgs,
       neovim,
       flake-utils,
-      home-manager,
     }:
     flake-utils.lib.eachDefaultSystem (
       system:
@@ -55,13 +50,10 @@
         deps = import ./nix/dependencies.nix { inherit pkgs; };
       in
       {
-        homeConfigurations.terminal = home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          modules = [ ./nix/home.nix ];
-        };
-
         packages = {
           default = pkgs.myNeovim;
+          neovim = pkgs.myNeovim;
+          terminal-tools = import ./nix/terminal-tools { inherit pkgs; };
         };
         apps = {
           neovim = {

@@ -7,65 +7,54 @@ let
       allowUnfree = true;
     };
   };
-  dependencies = import ./dependencies.nix { inherit pkgs; };
-
-  # Extract the Python environment from dependencies
-  pythonWithPkgs = pkgs.python310.withPackages (
-    ps: with ps; [
-      debugpy
-      pip
-    ]
-  );
 in
 {
-  home.username = "peter";
-  home.homeDirectory = "/home/peter";
+  home.username = builtins.getEnv "USER";
+  home.homeDirectory = builtins.getEnv "HOME";
 
   # This value determines the Home Manager release that your configuration is compatible with
-  home.stateVersion = "23.05";
+  home.stateVersion = "23.11";
 
   programs.home-manager.enable = true;
 
-  home.packages = dependencies.packages;
-
-  home.sessionVariables = {
-    OPENSSL_ROOT_DIR = "${pkgs.openssl.dev}";
-    OPENSSL_LIBRARIES = "${pkgs.openssl.out}/lib";
-    OPENSSL_INCLUDE_DIR = "${pkgs.openssl.dev}/include";
-
-    # spdlog variables
-    CMAKE_PREFIX_PATH = "${pkgs.spdlog}:$CMAKE_PREFIX_PATH";
-    spdlog_DIR = "${pkgs.spdlog}/lib/cmake/spdlog";
-    fmt_DIR = "${pkgs.fmt.dev}/lib/cmake/fmt";
-
-    # Development environment variables
-    CARGO_HOME = "$HOME/.cargo";
-    CPATH = "${pkgs.glibc.dev}/include:${pkgs.gcc}/include/c++/${pkgs.gcc.version}:$CPATH";
-    CPLUS_INCLUDE_PATH = "${pkgs.glibc.dev}/include:${pkgs.gcc}/include/c++/${pkgs.gcc.version}:$CPLUS_INCLUDE_PATH";
-    CUDA_HOME = "/usr/local/cuda";
-    GOPATH = "$HOME/go";
-    GOROOT = "${pkgs.go}/share/go";
-    LD_LIBRARY_PATH = "${pkgs.openblas}/lib:${pkgs.spdlog}/lib:/usr/local/cuda-12.6/lib64:$LD_LIBRARY_PATH";
-    LIBRARY_PATH = "${pkgs.glibc}/lib:${pkgs.gcc}/lib:$LIBRARY_PATH";
-    NPM_CONFIG_PREFIX = "$HOME/.npm-global";
-    PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
-    PYTHONPATH = "${pythonWithPkgs}/${pythonWithPkgs.sitePackages}:/usr/lib/python3/dist-packages:/usr/local/lib/python3/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:$PYTHONPATH";
-    PYTHONUSERBASE = "$HOME/.local/python";
-    RUSTUP_HOME = "$HOME/.rustup";
-  };
-
-  # Add paths to PATH
-  home.sessionPath = [
-    "$GOPATH/bin"
-    "$CARGO_HOME/bin"
-    "$PYTHONUSERBASE/bin"
-    "$NPM_CONFIG_PREFIX/bin"
-    "/home/peter/apps/balena-cli"
-    "/opt/node/bin"
-    "/opt/nvim-linux64/bin"
-    "/usr/local/cuda/bin"
-    "${pkgs.lib.makeBinPath dependencies.packages}"
-  ];
+  # home.sessionVariables = {
+  #   OPENSSL_ROOT_DIR = "${pkgs.openssl.dev}";
+  #   OPENSSL_LIBRARIES = "${pkgs.openssl.out}/lib";
+  #   OPENSSL_INCLUDE_DIR = "${pkgs.openssl.dev}/include";
+  #
+  #   # spdlog variables
+  #   CMAKE_PREFIX_PATH = "${pkgs.spdlog}:$CMAKE_PREFIX_PATH";
+  #   spdlog_DIR = "${pkgs.spdlog}/lib/cmake/spdlog";
+  #   fmt_DIR = "${pkgs.fmt.dev}/lib/cmake/fmt";
+  #
+  #   # Development environment variables
+  #   CARGO_HOME = "$HOME/.cargo";
+  #   CPATH = "${pkgs.glibc.dev}/include:${pkgs.gcc}/include/c++/${pkgs.gcc.version}:$CPATH";
+  #   CPLUS_INCLUDE_PATH = "${pkgs.glibc.dev}/include:${pkgs.gcc}/include/c++/${pkgs.gcc.version}:$CPLUS_INCLUDE_PATH";
+  #   CUDA_HOME = "/usr/local/cuda";
+  #   GOPATH = "$HOME/go";
+  #   GOROOT = "${pkgs.go}/share/go";
+  #   LD_LIBRARY_PATH = "${pkgs.openblas}/lib:${pkgs.spdlog}/lib:/usr/local/cuda-12.6/lib64:$LD_LIBRARY_PATH";
+  #   LIBRARY_PATH = "${pkgs.glibc}/lib:${pkgs.gcc}/lib:$LIBRARY_PATH";
+  #   NPM_CONFIG_PREFIX = "$HOME/.npm-global";
+  #   PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
+  #   PYTHONPATH = "${pythonWithPkgs}/${pythonWithPkgs.sitePackages}:/usr/lib/python3/dist-packages:/usr/local/lib/python3/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:$PYTHONPATH";
+  #   PYTHONUSERBASE = "$HOME/.local/python";
+  #   RUSTUP_HOME = "$HOME/.rustup";
+  # };
+  #
+  # # Add paths to PATH
+  # home.sessionPath = [
+  #   "$GOPATH/bin"
+  #   "$CARGO_HOME/bin"
+  #   "$PYTHONUSERBASE/bin"
+  #   "$NPM_CONFIG_PREFIX/bin"
+  #   "/home/peter/apps/balena-cli"
+  #   "/opt/node/bin"
+  #   "/opt/nvim-linux64/bin"
+  #   "/usr/local/cuda/bin"
+  #   "${pkgs.lib.makeBinPath dependencies.packages}"
+  # ];
 
   # Configure alacritty
   programs.alacritty = {

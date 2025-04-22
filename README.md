@@ -38,21 +38,12 @@ docker run -it --privileged --net host -v ~/.nix-profile:/nix-profile -v /nix/st
 ```
 This way, you can run neovim with `/nix-profile/bin/nvim`.
 
-## Home-manager
-The home.nix file provides configuration files for zsh (including oh-my-zsh) and tmux.
-Furthermore, a whole lot of dependencies are installed to develop with.
+## Terminal tools
+The `terminal-tools` directory holds a configuration for zsh and tmux. This cab be used in parallel with your favourite terminal, which you should install on your system. Previously, I've tried (a) packaging the terminal as a standalone Nix executable using nixGL, and (b) having the terminal managed by home-manager.
 
-To use this home configuration, you have to enable home-manager:
+In the case of (a), nixGL caused issues when launching GUI applications from the terminal. In the case of (b), home-manager clashed with system dependencies, making it difficult to work on projects. Therefore, if you have some system dependencies already installed, it is best to go for this hybrid setup.
 
-```bash
-nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
-nix-channel --update
-nix-shell '<home-manager>' -A install
-```
+## System
+The `system` directory holds all system dependencies, i.e. anything not managed by Nix. When I next do a clean Ubuntu install, I might swap this part out for home-manager. 
 
-This should allow you to run `home-manager` commands.
-
-Now, to enable the configuration in *home.nix*, run `home-manager switch --file home.nix` while in this repository's root directory. If you already have a `~/.zshrc` or `~/.config/tmux/tmux.conf`, you will get asked to rename these.
-
-## Dotfiles
-The `dotfiles` directory holds .envrc files to be used when developing specific applications. Currently, only a ROS2 environment is supported. To use this, put `flake.nix` and `.envrc` in your ROS2 workspace.
+The `install.sh` script installs basic system dependencies, i3 window manager with polybar, and alacritty as a terminal emulator. Finally, it copies the configurations for these applications to `~/.config/`.
