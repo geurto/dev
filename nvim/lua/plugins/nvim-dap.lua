@@ -59,7 +59,7 @@ dap.adapters.delve = {
 
 dap.configurations.cpp = {
 	{
-		name = "Launch file",
+		name = "Local: launch",
 		type = "cppdbg",
 		request = "launch",
 		program = function()
@@ -67,41 +67,6 @@ dap.configurations.cpp = {
 		end,
 		cwd = "${workspaceFolder}",
 		stopOnEntry = false,
-	},
-}
-
-dap.configurations.c = dap.configurations.cpp
-
-dap.configurations.rust = {
-	{
-		type = "cppdbg",
-		request = "launch",
-		name = "Launch Rust executable",
-		program = function()
-			local cwd = vim.fn.getcwd()
-			local cmd = "cargo build"
-			local handle
-			local output = ""
-			handle = vim.loop.spawn(cmd, {
-				args = {},
-				cwd = cwd,
-				stdio = { nil, nil, nil },
-			}, function(code)
-				handle:close()
-				if code ~= 0 then
-					vim.notify("Cargo build failed", vim.log.levels.ERROR)
-				else
-					vim.defer_fn(function()
-						require("dap").continue()
-					end, 100)
-				end
-			end)
-			return vim.fn.input("Path to executable: ", cwd .. "/target/debug/", "file")
-		end,
-		cwd = "${workspaceFolder}",
-		stopOnEntry = false,
-		args = {},
-		runInTerminal = false,
 		setupCommands = {
 			{
 				text = "-enable-pretty-printing",
@@ -110,22 +75,61 @@ dap.configurations.rust = {
 			},
 		},
 	},
+
+	{
+		name = "Docker: Attach to gdbserver",
+		type = "cppdbg",
+		request = "launch",
+		MIMode = "gdb",
+		miDebuggerServerAddress = "localhost:1234",
+		miDebuggerPath = "/usr/bin/gdb",
+		cwd = "${workspaceFolder}",
+		program = "${workspaceFolder}/your_program",
+		setupCommands = {
+			{
+				text = "-enable-pretty-printing",
+				description = "enable pretty printing",
+				ignoreFailures = false,
+			},
+		},
+		sourceFileMap = {
+			["/app"] = "${workspaceFolder}",
+		},
+	},
+}
+
+dap.configurations.c = dap.configurations.cpp
+
+dap.configurations.rust = {
+	{
+		name = "Local: Launch",
+		type = "codelldb",
+		request = "launch",
+		program = function()
+			return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/target/debug/", "file")
+		end,
+		cwd = "${workspaceFolder}",
+		stopOnEntry = false,
+	},
+	{
+		name = "Docker: Attach to lldb-server",
+		type = "codelldb",
+		request = "attach",
+		port = 1234,
+		host = "localhost",
+		sourceMap = {
+			["/app"] = "${workspaceFolder}",
+		},
+	},
 }
 
 dap.configurations.python = {
 	{
-		-- The first three options are required by nvim-dap
-		type = "python", -- the type here established the link to the adapter definition: `dap.adapters.python`
+		type = "python",
 		request = "launch",
-		name = "Launch file",
-
-		-- Options below are for debugpy, see https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for supported options
-
-		program = "${file}", -- This configuration will launch the current file if used.
+		name = "Local: launch",
+		program = "${file}",
 		pythonPath = function()
-			-- debugpy supports launching an application with a different interpreter then the one used to launch debugpy itself.
-			-- The code below looks for a `venv` or `.venv` folder in the current directly and uses the python within.
-			-- You could adapt this - to for example use the `VIRTUAL_ENV` environment variable.
 			local cwd = vim.fn.getcwd()
 			if vim.fn.executable(cwd .. "/venv/bin/python") == 1 then
 				return cwd .. "/venv/bin/python"
@@ -138,6 +142,23 @@ dap.configurations.python = {
 		console = "integratedTerminal",
 		redirectOutput = true,
 		justmyCode = false,
+	},
+
+	{
+		name = "Docker: Remote Attach",
+		type = "python",
+		request = "attach",
+		connect = {
+			host = "localhost",
+			port = 5678,
+		},
+		pathMappings = {
+			{
+				localRoot = vim.fn.getcwd(),
+				remoteRoot = "/app",
+			},
+		},
+		justMyCode = false,
 	},
 }
 

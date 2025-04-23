@@ -61,11 +61,6 @@ cargo install alacritty
 echo "---------- Installing stylua ----------"
 cargo install stylua
 
-# Install fzf
-echo "---------- Installing fzf ----------"
-git clone --depth 1 https://github.com/junegunn/fzf.git ~/.fzf
-~/.fzf/install
-
 # Copy configs to ~/.config
 echo "---------- Copying configurations ----------"
 SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
