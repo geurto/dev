@@ -26,6 +26,12 @@ And put the following content in it:
  experimental-features = nix-command flakes
 ```
 
+If you wish to develop ROS packages using `nix-ros-overlay`, you should also add their caches to `nix.conf`:
+```bash
+substituters = https://cache.nixos.org https://ros.cachix.org
+trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= ros.cachix.org-1:dSyZxI8geDCJrwgvCOHDoAfOm5sV1wCPjBkKL+38Rvo=
+```
+
 ### Running neovim in a Docker container
 In order to run neovim in a Docker container for debugging, you can mount the `nvim` directory (assuming the docker image has neovim installed):
 ```bash

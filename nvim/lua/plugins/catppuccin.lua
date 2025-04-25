@@ -6,47 +6,15 @@ local function setup_catppuccin()
 		return
 	end
 
+	-- Get the mocha palette
+	local colors = require("catppuccin.palettes").get_palette("mocha")
+
 	-- Configure Catppuccin with explicit settings
 	catppuccin.setup({
-		flavour = "mocha", -- latte, frappe, macchiato, mocha
+		flavour = "mocha",
 		background = { -- :h background
 			light = "latte",
 			dark = "mocha",
-		},
-		transparent_background = false,
-		term_colors = true,
-		dim_inactive = {
-			enabled = false,
-			shade = "dark",
-			percentage = 0.15,
-		},
-		styles = {
-			comments = { "italic" },
-			conditionals = { "italic" },
-			loops = {},
-			functions = {},
-			keywords = {},
-			strings = {},
-			variables = {},
-			numbers = {},
-			booleans = {},
-			properties = {},
-			types = {},
-			operators = {},
-		},
-		color_overrides = {},
-		custom_highlights = {
-			-- Fix Neo-tree and other window separators
-			VertSplit = { fg = "#6e738d" },
-			NeoTreeWinSeparator = { fg = "#6e738d", bg = "#1e1e2e" },
-
-			-- Fix floating windows
-			FloatBorder = { fg = "#6e738d", bg = "#1e1e2e" },
-			NormalFloat = { bg = "#1e1e2e" },
-
-			-- Fix Trouble and other special windows
-			TroubleNormal = { bg = "#1e1e2e" },
-			WhichKeyFloat = { bg = "#1e1e2e" },
 		},
 		integrations = {
 			cmp = true,
@@ -55,7 +23,6 @@ local function setup_catppuccin()
 			telescope = true,
 			notify = true,
 			mini = true,
-			-- For more plugins integrations see https://github.com/catppuccin/nvim#integrations
 			neotree = true,
 			which_key = true,
 			indent_blankline = {
@@ -89,7 +56,7 @@ local function setup_catppuccin()
       autocmd!
       autocmd VimEnter * lua vim.defer_fn(function() vim.cmd('doautocmd ColorScheme') end, 10)
     augroup END
-  ]])
+    ]])
 end
 
 setup_catppuccin()

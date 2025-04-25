@@ -44,9 +44,9 @@ vim.g.rustaceanvim = {
 	},
 }
 
-vim.keymap.set("n", "<leader>t", "<nop>", { desc = "Rustaceanvim" })
-vim.keymap.set("n", "<leader>td", "<cmd>RustLsp debuggables<cr>", { silent = true, desc = "Debug" })
-vim.keymap.set("n", "<leader>tr", "<cmd>RustLsp runnables<cr>", { silent = true, desc = "Run" })
-vim.keymap.set("n", "<leader>tc", "<cmd>RustLsp openCargo<cr>", { silent = true, desc = "Open Cargo.toml" })
-vim.keymap.set("n", "<leader>ta", "<cmd>RustLsp codeAction<cr>", { silent = true, desc = "Code Action" })
-vim.keymap.set("n", "<leader>te", "<cmd>RustLsp explainError<cr>", { silent = true, desc = "Explain Error" })
+vim.keymap.set("n", "<leader>r", "<nop>", { desc = "Rustaceanvim" })
+vim.keymap.set("n", "<leader>rd", "<cmd>RustLsp debuggables<cr>", { silent = true, desc = "Debug" })
+vim.keymap.set("n", "<leader>rr", "<cmd>RustLsp runnables<cr>", { silent = true, desc = "Run" })
+vim.keymap.set("n", "<leader>rc", "<cmd>RustLsp openCargo<cr>", { silent = true, desc = "Open Cargo.toml" })
+vim.keymap.set("n", "<leader>ra", "<cmd>RustLsp codeAction<cr>", { silent = true, desc = "Code Action" })
+vim.keymap.set("n", "<leader>re", "<cmd>RustLsp explainError<cr>", { silent = true, desc = "Explain Error" })
