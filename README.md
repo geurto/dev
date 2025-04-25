@@ -6,30 +6,19 @@ First install nix:
 ```bash
 sh <(curl -L https://nixos.org/nix/install) --daemon
 ```
+Then, move `nix/nix.conf` to `/etc/nix/nix.conf`.
+
+## Installation
+If using nix-profile, run this command:
+```bash
+nix profile install dev terminal-tools
+```
+This will ensure all the binaries are available as normal user commands.
 
 ## Running neovim
-
 To run neovim separately in your terminal, you can do:
 ```bash
 nix run --extra-experimental-features "nix-command flakes"  github:geurto/dev
-```
-It is worth creating an alias for this.
-
-If you do not want to add the ``--extra-experimental-features`` every time, you can create a ``nix.conf`` file:
-```bash
-mkdir -p ~/.config/nix
-nano ~/.config/nix/nix.conf
-```
-
-And put the following content in it:
-```bash 
- experimental-features = nix-command flakes
-```
-
-If you wish to develop ROS packages using `nix-ros-overlay`, you should also add their caches to `nix.conf`:
-```bash
-substituters = https://cache.nixos.org https://ros.cachix.org
-trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= ros.cachix.org-1:dSyZxI8geDCJrwgvCOHDoAfOm5sV1wCPjBkKL+38Rvo=
 ```
 
 ### Running neovim in a Docker container
@@ -39,9 +28,9 @@ docker run -it --privileged --net host -v <DEV_ROOT>/nvim/:/root/.config/nvim/ -
 ```
 
 ## Terminal tools
-The `terminal-tools` directory holds a configuration for zsh and tmux. This cab be used in parallel with your favourite terminal, which you should install on your system. Previously, I've tried (a) packaging the terminal as a standalone Nix executable using nixGL, and (b) having the terminal managed by home-manager.
+The `terminal-tools` directory holds a configuration for zsh and tmux. This can be used in parallel with your favourite terminal, which you should install on your system. Previously, I've tried (a) packaging the terminal as a standalone Nix executable using nixGL, and (b) having the terminal managed by home-manager.
 
-In the case of (a), nixGL caused issues when launching GUI applications from the terminal. In the case of (b), home-manager clashed with system dependencies, making it difficult to work on projects. Therefore, if you have some system dependencies already installed, it is best to go for this hybrid setup.
+In the case of (a), nixGL caused issues when launching GUI applications from the terminal. In the case of (b), home-manager clashed with system dependencies, making it difficult to work on projects. Therefore, if you have some system dependencies already installed, it is best to go for this hybrid setup. Of course, this only matters when running on Ubuntu or some other non-NixOS operating system.
 
 ## System
 The `system` directory holds all system dependencies, i.e. anything not managed by Nix. When I next do a clean Ubuntu install, I might swap this part out for home-manager. 
