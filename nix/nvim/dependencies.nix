@@ -10,10 +10,6 @@ let
       openssl.out
     ];
     nativeBuildInputs = [ pkgs.makeWrapper ];
-    postBuild = ''
-      wrapProgram $out/bin/openssl \
-        --set PKG_CONFIG_PATH "${openssl.dev}/lib/pkgconfig"
-    '';
   };
 
   cpptools = pkgs.runCommand "vscode-cpptools-extracted" { } ''
@@ -41,7 +37,6 @@ let
     curl
     delve
     fzf
-    gcc
     gdb
     git
     glibc
@@ -61,13 +56,11 @@ let
     nodePackages.typescript
     opensslEnv
     openssh
-    pkg-config
     podman-compose
     prettierd
     pyright
     pythonWithPkgs
     ripgrep
-    rustup
     spdlog
     stow
     stylua

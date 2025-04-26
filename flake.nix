@@ -46,8 +46,6 @@
             overlayNeovim
           ];
         };
-
-        deps = import ./nix/dependencies.nix { inherit pkgs; };
       in
       {
         packages = {
