@@ -1,16 +1,54 @@
 { pkgs }:
 let
-  customRC = import ./config.nix { inherit pkgs; };
   plugins = import ./plugins.nix { inherit pkgs; };
   dependencies = import ./dependencies.nix { inherit pkgs; };
+
+  luaConfigDir = ../../nvim-config/lua;
+
+  # since we need to load lua files in a specific order, define it here
+  orderedLuaFiles = [
+    "options.lua"
+    "keymaps.lua"
+
+    "alpha.lua"
+    "catppuccin.lua"
+    "conform.lua"
+    "cpp.lua"
+    "gitsigns.lua"
+    "harpoon.lua"
+    "lualine.lua"
+    "markview.lua"
+    "mini.lua"
+    "neo-tree.lua"
+    "noice.lua"
+    "nvim-cmp.lua"
+    "nvim-dap-ui.lua"
+    "nvim-dap.lua"
+    "nvim-lspconfig.lua"
+    "nvim-notify.lua"
+    "nvim-treesitter.lua"
+    "rustaceanvim.lua"
+    "telescope.lua"
+    "todo-comments.lua"
+    "trouble.lua"
+    "which-key.lua"
+  ];
+
+  customRC = pkgs.lib.concatStringsSep "\n" (
+    pkgs.lib.map (name: "luafile ${luaConfigDir}/${name}") orderedLuaFiles
+  );
+  traceCustomRC = builtins.trace customRC customRC;
 
   neovimRuntimeDependencies = pkgs.symlinkJoin {
     name = "neovimRuntimeDependencies";
     paths = dependencies.packages;
     postBuild = ''
+      mkdir -p $out/bin
       for f in $out/lib/node_modules/.bin/*; do
-         path="$(readlink --canonicalize-missing "$f")"
-         ln -s "$path" "$out/bin/$(basename $f)"
+        if [ -f "$f" ]; then 
+           path="$(readlink --canonicalize-missing "$f")"
+           ln -s "$path" "$out/bin/$(basename "$f")"
+        fi
       done
     '';
   };
@@ -18,7 +56,7 @@ let
   NeovimUnwrapped = pkgs.wrapNeovim pkgs.neovim {
     configure = {
       inherit customRC;
-      packages.all.start = plugins;
+      packages.myPlugins.start = plugins;
     };
   };
 in
@@ -33,6 +71,6 @@ pkgs.writeShellApplication {
     export fmt_DIR=${pkgs.fmt.dev}/lib/cmake/fmt
 
     # Run Neovim
-    ${NeovimUnwrapped}/bin/nvim "$@"
+    exec ${NeovimUnwrapped}/bin/nvim "$@"
   '';
 }
