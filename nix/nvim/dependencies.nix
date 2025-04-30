@@ -18,13 +18,6 @@ let
     chmod +x $out/bin/*
   '';
 
-  pythonWithPkgs = python310.withPackages (
-    ps: with ps; [
-      debugpy
-      pip
-    ]
-  );
-
   packages = [
     bat
     binutils
@@ -32,7 +25,6 @@ let
     cargo-nextest
     ccls
     clang-tools
-    cmake
     cpptools
     curl
     delve
@@ -41,7 +33,6 @@ let
     git
     glibc
     gnumake
-    go
     golangci-lint
     gopls
     gotools
@@ -59,7 +50,6 @@ let
     podman-compose
     prettierd
     pyright
-    pythonWithPkgs
     ripgrep
     spdlog
     stow
@@ -74,7 +64,6 @@ let
     xorg.xhost
     xsel
     zsh
-
   ];
 in
 {
