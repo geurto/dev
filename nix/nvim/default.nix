@@ -16,6 +16,7 @@ let
     "cpp.lua"
     "gitsigns.lua"
     "harpoon.lua"
+    "lazygit.lua"
     "lualine.lua"
     "markview.lua"
     "mini.lua"

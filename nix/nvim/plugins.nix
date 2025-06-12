@@ -38,6 +38,7 @@ with pkgs.vimPlugins;
       "harpoon"
     ];
   })
+  lazygit-nvim
   lsp_lines-nvim
   lualine-nvim
   luasnip

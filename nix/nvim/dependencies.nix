@@ -37,6 +37,7 @@ let
     gopls
     gotools
     isort
+    lazygit
     lldb
     lua-language-server
     nixfmt-rfc-style
