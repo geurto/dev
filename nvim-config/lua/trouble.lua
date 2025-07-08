@@ -11,9 +11,10 @@ require("trouble").setup({
 })
 
 -- keymaps
+vim.keymap.set("n", "<leader>x", "<nop>", { desc = "Trouble" })
 vim.keymap.set(
 	"n",
 	"<leader>xx",
 	"<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
-	{ desc = "Buffer Diagnostics (Trouble)", remap = true }
+	{ desc = "Buffer Diagnostics", remap = true }
 )

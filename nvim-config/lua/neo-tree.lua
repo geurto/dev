@@ -91,17 +91,9 @@ vim.api.nvim_create_autocmd("TermClose", {
 
 -- Keymaps
 -- Explorer NeoTree (cwd)
-vim.keymap.set("n", "<leader>fe", function()
+vim.keymap.set("n", "<leader>e", function()
 	require("neo-tree.command").execute({ toggle = true, dir = vim.uv and vim.uv.cwd() or vim.loop.cwd() })
 end, { desc = "Explorer NeoTree (cwd)" })
-
--- Alias for Explorer
-vim.keymap.set("n", "<leader>e", "<leader>fe", { desc = "Explorer NeoTree (cwd)", remap = true })
-
--- Git Explorer
-vim.keymap.set("n", "<leader>ge", function()
-	require("neo-tree.command").execute({ source = "git_status", toggle = true })
-end, { desc = "Git Explorer" })
 
 -- Buffer Explorer
 vim.keymap.set("n", "<leader>be", function()
