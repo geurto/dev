@@ -61,6 +61,7 @@ with pkgs.vimPlugins;
   telescope-nvim
   todo-comments-nvim
   trouble-nvim
+  undotree
   vim-fugitive
   vim-nix
   which-key-nvim

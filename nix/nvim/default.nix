@@ -32,6 +32,7 @@ let
     "telescope.lua"
     "todo-comments.lua"
     "trouble.lua"
+    "undotree.lua"
     "which-key.lua"
   ];
 
