@@ -37,6 +37,24 @@ if ! command -v docker &> /dev/null; then
   sudo apt update
 fi 
 
+# Install GitHub CLI and Zen
+echo "---------- Installing GitHub CLI ----------"
+(type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) \
+	&& sudo mkdir -p -m 755 /etc/apt/keyrings \
+	&& out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+	&& cat $out | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
+	&& sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+	&& sudo mkdir -p -m 755 /etc/apt/sources.list.d \
+	&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+	&& sudo apt update \
+	&& sudo apt install gh -y
+gh auth login
+echo "---------- Installing Zen Browser ----------"
+gh release download --repo zen-browser/desktop --pattern 'zen.linux-x86_64.tar.xz' --clobber \
+  && sudo tar -xf zen.linux-x86_64.tar.xz -C /opt \
+  && sudo ln -s /opt/zen/zen /usr/bin/zen
+  && rm zen.linux-x86_64.tar.xz
+
 # Install i3-wm and polybar -- use TOUCHPAD_NAME in case I get a different laptop
 echo "---------- Installing window manager ----------"
 TOUCHPAD_NAME=$(xinput | grep -i touchpad | awk -F'↳|id=' '{print $2}' | xargs)
@@ -53,6 +71,32 @@ sudo apt install -y \
   light-locker \
   lightdm \
   xautolock
+
+echo "---------- Installing i3lock-color ----------"
+sudo apt install -y \
+  autoconf \
+  pkg-config \
+  libpam0g-dev \
+  libcairo2-dev \
+  libfontconfig1-dev \
+  libxcb-composite0-dev \
+  libev-dev \
+  libx11-xcb-dev \
+  libxcb-xkb-dev \
+  libxcb-xinerama0-dev \
+  libxcb-randr0-dev \
+  libxcb-image0-dev \
+  libxcb-util-dev \
+  libxcb-xrm-dev \
+  libxkbcommon-dev \
+  libxkbcommon-x11-dev \
+  libjpeg-dev \
+  libgif-dev
+git clone https://github.com/Raymo111/i3lock-color.git \
+  && cd i3lock-color \
+  && ./install-i3lock-color.sh \
+  && cd ../ \
+  && rm -rf i3lock-color
 
 # Install alacritty, stylua, and zellij
 echo "---------- Installing alacritty ----------"
