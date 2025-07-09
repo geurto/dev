@@ -33,6 +33,6 @@ The `terminal-tools` directory holds a configuration for zsh and tmux. This can 
 In the case of (a), nixGL caused issues when launching GUI applications from the terminal. In the case of (b), home-manager clashed with system dependencies, making it difficult to work on projects. Therefore, if you have some system dependencies already installed, it is best to go for this hybrid setup. Of course, this only matters when running on Ubuntu or some other non-NixOS operating system.
 
 ## System
-The `system` directory holds all system dependencies, i.e. anything not managed by Nix. When I next do a clean Ubuntu install, I might swap this part out for home-manager. 
+The `ubuntu` directory holds all Ubuntu system dependencies, i.e. anything not managed by Nix or NixOS. When I next do a clean Ubuntu install, I might swap this part out for home-manager. 
 
 The `install.sh` script installs basic system dependencies, i3 window manager with polybar, and alacritty as a terminal emulator. Finally, it copies the configurations for these applications to `~/.config/`. Note that `alacritty.toml` assumes that `zsh` is installed by Nix.
