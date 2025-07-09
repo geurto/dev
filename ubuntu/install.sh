@@ -52,7 +52,7 @@ gh auth login
 echo "---------- Installing Zen Browser ----------"
 gh release download --repo zen-browser/desktop --pattern 'zen.linux-x86_64.tar.xz' --clobber \
   && sudo tar -xf zen.linux-x86_64.tar.xz -C /opt \
-  && sudo ln -s /opt/zen/zen /usr/bin/zen
+  && sudo ln -s /opt/zen/zen /usr/bin/zen \ 
   && rm zen.linux-x86_64.tar.xz
 
 # Install i3-wm and polybar -- use TOUCHPAD_NAME in case I get a different laptop
