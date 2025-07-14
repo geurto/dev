@@ -35,4 +35,4 @@ In the case of (a), nixGL caused issues when launching GUI applications from the
 ## System
 The `ubuntu` directory holds all Ubuntu system dependencies, i.e. anything not managed by Nix or NixOS. When I next do a clean Ubuntu install, I might swap this part out for home-manager. 
 
-The `install.sh` script installs basic system dependencies, i3 window manager with polybar, and alacritty as a terminal emulator. Finally, it copies the configurations for these applications to `~/.config/`. Note that `alacritty.toml` assumes that `zsh` is installed by Nix.
+The `install.sh` script installs basic system dependencies, i3 window manager with polybar, and alacritty as a terminal emulator. Finally, it copies the configurations for these applications to `~/.config/`. For intended alacritty use, make sure that `$SHELL` evaluates to the Nix-installed `zsh`, e.g. `~/.nix-profile/bin/zsh`.
