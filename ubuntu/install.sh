@@ -119,7 +119,10 @@ sudo systemctl enable /etc/systemd/system/lock-on-suspend.service
 ln -s $SCRIPT_DIR/polybar/config.ini ~/.config/polybar/config.ini
 ln -s $SCRIPT_DIR/polybar/launch.sh ~/.config/polybar/launch.sh
 
+# /opt/bin workaround needed to make user-agnostic zsh possible in alacritty.toml
 (mkdir -p ~/.config/alacritty && rm ~/.config/alacritty/*) || true
+sudo mkdir -p /opt/bin/
+sudo ln -s ~/.nix-profile/bin/zsh /opt/bin/zsh
 ln -s $SCRIPT_DIR/alacritty/alacritty.toml ~/.config/alacritty/alacritty.toml
 ln -s $SCRIPT_DIR/alacritty/catppuccin-mocha.toml ~/.config/alacritty/catppuccin-mocha.toml
 

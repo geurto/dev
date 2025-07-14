@@ -21,8 +21,10 @@ style = "Regular"
 [general]
 import = ["~/.config/alacritty/catppuccin-mocha.toml"]
 
+# /opt/bin/zsh is linked in install.sh, make sure Nix installed terminal-tools
 [terminal.shell]
 args = ["-l"]
+program = "/opt/bin/zsh"
 
 [window]
 decorations = "full"
