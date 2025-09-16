@@ -215,6 +215,7 @@ exec_always --no-startup-id feh --bg-center ~/Pictures/wallpaper.png
 exec_always --no-startup-id ff-theme-util
 exec_always --no-startup-id fix_xcursor
 exec_always --no-startup-id $HOME/.config/polybar/i3wmthemer_bar_launch.sh
+exec_always --no-startup-id $HOME/.config/i3/init.sh
 
 # Theme colors
 client.focused          #272827 #272827 #657b83 #272827 #272827

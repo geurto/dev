@@ -70,7 +70,8 @@ sudo apt install -y \
   rofi \
   light-locker \
   lightdm \
-  xautolock
+  xautolock \
+  redshift
 
 echo "---------- Installing i3lock-color ----------"
 sudo apt install -y \
@@ -112,6 +113,7 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 (mkdir -p ~/.config/i3 && rm ~/.config/i3/*) || true
 ln -s $SCRIPT_DIR/i3/config ~/.config/i3/config
 ln -s $SCRIPT_DIR/i3/lock.sh ~/.config/i3/lock.sh
+ln -s $SCRIPT_DIR/i3/init.sh ~/.config/i3/init.sh
 sudo cp $SCRIPT_DIR/i3/lock-on-suspend.service /etc/systemd/system/lock-on-suspend.service
 sudo systemctl enable /etc/systemd/system/lock-on-suspend.service
 
