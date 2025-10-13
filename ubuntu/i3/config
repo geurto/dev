@@ -298,6 +298,9 @@ exec --no-startup-id /usr/lib/gnome-settings-daemon/gsd-power
 # Start gnome-screensaver daemon 
 exec --no-startup-id gnome-screensaver 
 
+# Start the GNOME PolicyKit Authentication Agent
+exec --no-startup-id /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 &
+
 ## Screenshots
 bindsym Print exec --no-startup-id maim "/home/$USER/Pictures/$(date)"
 bindsym $mod+Print exec --no-startup-id maim --window $(xdotool getactivewindow) "/home/$USER/Pictures/$(date)"

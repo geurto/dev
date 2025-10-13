@@ -9,9 +9,9 @@ sh <(curl -L https://nixos.org/nix/install) --daemon
 Then, move `nix/nix.conf` to `/etc/nix/nix.conf`.
 
 ## Installation
-If using nix-profile, run this command:
+If using nix-profile, run this command while in the root directory:
 ```bash
-nix profile install dev terminal-tools
+nix profile install .#dev .#terminal-tools
 ```
 This will ensure all the binaries are available as normal user commands.
 
