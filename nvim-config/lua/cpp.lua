@@ -157,7 +157,7 @@ local function build_cmake_project()
 
 	local build_env = {}
 	if is_in_docker() then
-		build_env = get_build_env()
+		build_env = vim.tbl_extend("force", vim.fn.environ(), get_build_env())
 	end
 
 	-- Run the command asynchronously
