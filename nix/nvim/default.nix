@@ -55,7 +55,7 @@ let
     '';
   };
 
-  NeovimUnwrapped = pkgs.wrapNeovim pkgs.neovim {
+  NeovimUnwrapped = pkgs.wrapNeovim pkgs.neovim-unwrapped {
     configure = {
       inherit customRC;
       packages.myPlugins.start = plugins;
