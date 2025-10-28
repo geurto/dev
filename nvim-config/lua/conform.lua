@@ -1,8 +1,14 @@
 require("conform").setup({
 	formatters_by_ft = {
+		c = { "lsp" },
+		cpp = { "lsp" },
+		cuda = { "lsp" },
 		lua = { "stylua" },
 		python = { "isort", "black" },
+		objc = { "lsp" },
+		objcpp = { "lsp" },
 		javascript = { "prettierd", "prettier", stop_after_first = true },
+		nix = { "nixfmt" },
 		rust = {
 			"rustfmt",
 			extra_args = function()
@@ -14,7 +20,6 @@ require("conform").setup({
 				end
 			end,
 		},
-		nix = { "nixfmt" },
 		xml = { "xmlformat" },
 		["xacro"] = { "xmlformat" },
 		["urdf"] = { "xmlformat" },
