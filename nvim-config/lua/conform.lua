@@ -1,10 +1,6 @@
 require("conform").setup({
 	formatters_by_ft = {
-		c = { "lsp" },
-		cpp = { "lsp" },
 		lua = { "stylua" },
-		objc = { "lsp" },
-		objcpp = { "lsp" },
 		python = { "isort", "black" },
 		javascript = { "prettierd", "prettier", stop_after_first = true },
 		nix = { "nixfmt" },
@@ -23,11 +19,9 @@ require("conform").setup({
 		["xacro"] = { "xmlformat" },
 		["urdf"] = { "xmlformat" },
 	},
-	default_format_opts = {
-		lsp_format = "fallback",
-	},
 	format_on_save = {
 		timeout_ms = 500,
+		lsp_format = "fallback",
 	},
 	formatters = {
 		shfmt = {

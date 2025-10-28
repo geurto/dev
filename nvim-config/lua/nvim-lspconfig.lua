@@ -10,7 +10,6 @@ lspconfig.clangd.setup({
 		"--header-insertion=iwyu",
 		"--completion-style=detailed",
 		"--function-arg-placeholders",
-		"--fallback-style=llvm",
 	},
 	init_options = {
 		compilationDatabasePath = ".clangd",
