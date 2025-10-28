@@ -7,14 +7,11 @@ C++ Debugging Guide for Neovim
 Setup Steps:
 -----------
 1. Create a build directory:
-   $ mkdir -p build
+   $ mkdir -p .clangd 
 
 2. Generate build files with CMake:
-   $ cd build && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug ../
+   $ cd .clangd && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug ../
    
-3. Build your project:
-   $ make
-
 4. Link compile_commands.json to project root (for LSP):
    $ ln -s build/compile_commands.json .
 ]]
@@ -96,7 +93,6 @@ end
 
 local function build_cmake_project()
 	local root_dir = require("lspconfig.util").root_pattern(".git", "CMakeLists.txt")()
-	local dir = vim.fn.expand("%:p:h")
 
 	if not root_dir then
 		print("Could not find project root ('.git' or 'CMakeLists.txt').")
@@ -121,7 +117,6 @@ local function build_cmake_project()
 	local cmd = string.format(
 		"mkdir -p %s && \
          cd %s && \
-         rm -rf * && \
          cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug %s",
 		build_dir,
 		build_dir,
@@ -161,7 +156,7 @@ local function build_cmake_project()
 	end
 
 	-- Run the command asynchronously
-	local job = vim.system({ "sh", "-c", cmd }, {
+	local job = vim.system({ "/bin/bash", "-c", cmd }, {
 		stdout = function(_, data)
 			vim.schedule(function()
 				append_and_scroll(data)
