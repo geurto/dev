@@ -15,3 +15,4 @@ echo "Changing screen layout to $SELECTED_LAYOUT..."
 
 ~/.screenlayout/$SELECTED_LAYOUT
 
+feh --bg-fill ~/Pictures/wallpaper.png || echo "Unable to fit wallpaper to new screen." 
