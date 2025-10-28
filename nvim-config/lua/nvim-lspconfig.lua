@@ -13,7 +13,7 @@ lspconfig.clangd.setup({
 		"--fallback-style=llvm",
 	},
 	init_options = {
-		compilationDatabasePath = "build",
+		compilationDatabasePath = ".clangd",
 	},
 	on_attach = function(client, bufnr)
 		client.server_capabilities.signatureHelpProvider = false

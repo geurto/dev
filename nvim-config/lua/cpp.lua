@@ -94,38 +94,38 @@ local function get_build_env()
 	return env
 end
 
--- function to build the local CMake project
 local function build_cmake_project()
+	local root_dir = require("lspconfig.util").root_pattern(".git", "CMakeLists.txt")()
 	local dir = vim.fn.expand("%:p:h")
 
-	-- Find all CMakeLists.txt files in the project
-	local cmake_files = vim.fs.find("CMakeLists.txt", {
-		path = dir,
-		type = "file",
-		limit = math.huge,
-	})
-
-	if #cmake_files == 0 then
-		print(
-			"No CMakeLists.txt found in "
-				.. dir
-				.. " -- please run this command in a directory containing a CMakeLists.txt file."
-		)
+	if not root_dir then
+		print("Could not find project root ('.git' or 'CMakeLists.txt').")
 		return
 	end
 
-	-- Construct the command
+	local package_dir = vim.fs.find("CMakeLists.txt", {
+		path = vim.fn.expand("%:p:h"),
+		type = "file",
+		upward = true,
+		stop = root_dir,
+	})[1]
+
+	if not package_dir then
+		print("No CMakeLists.txt found in current directory or ancestors up to project root.")
+		return
+	end
+	package_dir = vim.fn.fnamemodify(package_dir, ":h")
+
+	local build_dir = root_dir .. "/.clangd"
+
 	local cmd = string.format(
-		"cd %s && \
-    mkdir -p build && \
-    cd build && \
-    cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug ../ && \
-    make && \
-    cd .. && \
-    if [ ! -L compile_commands.json ] && [ -f build/compile_commands.json ]; then \
-        ln -sf build/compile_commands.json compile_commands.json; \
-    fi",
-		dir
+		"mkdir -p %s && \
+         cd %s && \
+         rm -rf * && \
+         cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug %s",
+		build_dir,
+		build_dir,
+		package_dir
 	)
 
 	-- Create a new buffer for output
