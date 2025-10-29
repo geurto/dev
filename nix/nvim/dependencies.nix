@@ -52,6 +52,7 @@ let
     prettierd
     pyright
     ripgrep
+    rust-analyzer
     spdlog
     stow
     stylua
