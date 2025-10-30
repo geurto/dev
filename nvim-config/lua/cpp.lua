@@ -7,13 +7,13 @@ C++ Debugging Guide for Neovim
 Setup Steps:
 -----------
 1. Create a build directory:
-   $ mkdir -p .clangd 
+   $ mkdir -p .clangd-build
 
 2. Generate build files with CMake:
-   $ cd .clangd && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug ../
+   $ cd .clangd-build && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug ../
    
 4. Link compile_commands.json to project root (for LSP):
-   $ ln -s build/compile_commands.json .
+   $ ln -s .clangd-build/compile_commands.json .
 ]]
 
 	-- Create a new floating window
@@ -112,7 +112,7 @@ local function build_cmake_project()
 	end
 	package_dir = vim.fn.fnamemodify(package_dir, ":h")
 
-	local build_dir = root_dir .. "/.clangd"
+	local build_dir = root_dir .. "/.clangd-build"
 
 	local cmd = string.format(
 		"mkdir -p %s && \
