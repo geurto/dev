@@ -29,6 +29,7 @@ vim.g.rustaceanvim = {
 		},
 	},
 	server = {
+		cmd = { "rust-analyzer" },
 		default_settings = {
 			["rust-analyzer"] = {
 				cargo = {
