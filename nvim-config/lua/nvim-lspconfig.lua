@@ -12,7 +12,7 @@ lspconfig.clangd.setup({
 		"--function-arg-placeholders",
 	},
 	init_options = {
-		compilationDatabasePath = ".clangd",
+		compilationDatabasePath = ".clangd-build",
 	},
 	on_attach = function(client, bufnr)
 		client.server_capabilities.signatureHelpProvider = false

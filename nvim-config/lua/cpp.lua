@@ -10,10 +10,14 @@ Setup Steps:
    $ mkdir -p .clangd-build
 
 2. Generate build files with CMake:
-   $ cd .clangd-build && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug ../
+   $ cd .clangd-build && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug <CMakeLists.txt folder>
    
 4. Link compile_commands.json to project root (for LSP):
    $ ln -s .clangd-build/compile_commands.json .
+
+If any custom file sources are needed, e.g. ROS2's setup.bash, add them to your repo's .clangd-build/build_setup.sh like so:
+    #!/bin/bash
+    source /opt/ros/jazzy/setup.bash
 ]]
 
 	-- Create a new floating window
@@ -63,30 +67,43 @@ local function is_in_docker()
 	return docker_env or in_cgroup
 end
 
--- When in a Docker container, we want to add system paths to build
+-- When in a Docker container, we create a clean build environment
 local function get_build_env()
+	print("Creating clean build environment for Docker...")
 	local env = {}
+	local current_env = vim.fn.environ()
 
-	local function get_env_as_string(name)
-		local value = vim.fn.getenv(name)
-		if value == nil then
-			return ""
-		else
-			return tostring(value)
+	env.PATH = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+	local safe_vars = {
+		-- Essential system variables
+		"HOME",
+		"USER",
+		"TERM",
+		"LANG",
+		"SHELL",
+
+		-- ROS2 variables
+		"AMENT_PREFIX_PATH",
+		"COLCON_PREFIX_PATH",
+		"ROS_DISTRO",
+		"ROS_VERSION",
+		"ROS_PACKAGE_PATH",
+
+		-- Variables related to the build workspace path itself
+		"CMAKE_PREFIX_PATH",
+	}
+	for _, var in ipairs(safe_vars) do
+		local value = current_env[var]
+		if value ~= nil then
+			env[var] = value
 		end
 	end
 
-	local ld_library_path = get_env_as_string("LD_LIBRARY_PATH")
-	local library_path = get_env_as_string("LIBRARY_PATH")
-	local cplus_include_path = get_env_as_string("CPLUS_INCLUDE_PATH")
-	local c_include_path = get_env_as_string("C_INCLUDE_PATH")
-
-	env.LD_LIBRARY_PATH = "/usr/lib/x86_64-linux-gnu:" .. ld_library_path
-	env.LIBRARY_PATH = "/usr/lib/x86_64-linux-gnu:" .. library_path
-	env.CPLUS_INCLUDE_PATH = "/usr/include/x86_64-linux-gnu:/usr/include:" .. cplus_include_path
-	env.C_INCLUDE_PATH = "/usr/include/x86_64-linux-gnu:/usr/include:" .. c_include_path
-
-	print("Adding system directories to build paths")
+	env.LD_LIBRARY_PATH = "/usr/lib/x86_64-linux-gnu"
+	env.LIBRARY_PATH = "/usr/lib/x86_64-linux-gnu"
+	env.CPLUS_INCLUDE_PATH = "/usr/include/x86_64-linux-gnu:/usr/include"
+	env.C_INCLUDE_PATH = "/usr/include/x86_64-linux-gnu:/usr/include"
 
 	return env
 end
@@ -114,12 +131,28 @@ local function build_cmake_project()
 
 	local build_dir = root_dir .. "/.clangd-build"
 
+	-- Add custom files to be sourced (e.g. ROS2 setup.bash)
+	local source_file_name = "build_setup.sh"
+	local setup_file = build_dir .. "/" .. source_file_name
+	local source_cmd = ""
+
+	if vim.fn.filereadable(setup_file) == 1 then
+		print("Sourcing " .. setup_file .. " for build environment.")
+		source_cmd = "source ./" .. source_file_name .. " ; "
+	else
+		print("Note: " .. setup_file .. " not found. Using minimal environment.")
+	end
+
 	local cmd = string.format(
 		"mkdir -p %s && \
          cd %s && \
+	 find . -maxdepth 1 -type f -not -name '%s' -delete && \
+	 %s \
          cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug %s",
 		build_dir,
 		build_dir,
+		source_file_name,
+		source_cmd,
 		package_dir
 	)
 
@@ -150,9 +183,9 @@ local function build_cmake_project()
 		end
 	end
 
-	local build_env = {}
+	local build_env = nil
 	if is_in_docker() then
-		build_env = vim.tbl_extend("force", vim.fn.environ(), get_build_env())
+		build_env = get_build_env()
 	end
 
 	-- Run the command asynchronously
