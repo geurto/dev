@@ -1,7 +1,7 @@
 require("conform").setup({
 	formatters_by_ft = {
 		lua = { "stylua" },
-		python = { "isort", "black" },
+		python = { "ruff_format" },
 		javascript = { "prettierd", "prettier", stop_after_first = true },
 		nix = { "nixfmt" },
 		rust = {
@@ -24,6 +24,11 @@ require("conform").setup({
 		lsp_format = "fallback",
 	},
 	formatters = {
+		ruff_fix = {
+			command = "ruff",
+			args = { "check", "--fix", "--stdin-filename", "$FILENAME", "-" },
+			stdin = true,
+		},
 		shfmt = {
 			prepend_args = { "-i", "2" },
 		},

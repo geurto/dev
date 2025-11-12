@@ -17,6 +17,8 @@ dap.adapters.cppdbg = {
 }
 
 dap.adapters.python = function(cb, config)
+	local dap_path = vim.fn.trim(vim.fn.system("which python"))
+
 	if config.request == "attach" then
 		---@diagnostic disable-next-line: undefined-field
 		local port = (config.connect or config).port
@@ -33,7 +35,7 @@ dap.adapters.python = function(cb, config)
 	else
 		cb({
 			type = "executable",
-			command = "/home/peter/.virtualenvs/debugpy/bin/python",
+			command = dap_path,
 			args = { "-m", "debugpy.adapter" },
 			options = {
 				source_filetype = "python",

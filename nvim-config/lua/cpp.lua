@@ -147,8 +147,10 @@ local function build_cmake_project()
 		"mkdir -p %s && \
          cd %s && \
 	 find . -maxdepth 1 -type f -not -name '%s' -delete && \
+	 rm -R -- */ && \
 	 %s \
-         cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug %s",
+         cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug %s && \
+	 make",
 		build_dir,
 		build_dir,
 		source_file_name,
