@@ -1,6 +1,25 @@
 local lspconfig = require("lspconfig")
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
+lspconfig.rust_analyzer.setup({
+	capabilities = capabilities,
+	cmd = { "rust-analyzer" },
+	settings = {
+		["rust-analyzer"] = {
+			cargo = {
+				noDefaultFeatures = true,
+			},
+			checkOnSave = {
+				command = "clippy",
+			},
+			inlayHints = {
+				parameterHints = true,
+			},
+		},
+	},
+	on_attach = function(client, bufnr) end,
+})
+
 lspconfig.clangd.setup({
 	capabilities = capabilities,
 	cmd = {
