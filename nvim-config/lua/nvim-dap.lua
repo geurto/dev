@@ -105,7 +105,7 @@ dap.configurations.c = dap.configurations.cpp
 dap.configurations.rust = {
 	{
 		name = "Local: Launch",
-		type = "codelldb",
+		type = "lldb",
 		request = "launch",
 		program = function()
 			return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/target/debug/", "file")
@@ -115,7 +115,7 @@ dap.configurations.rust = {
 	},
 	{
 		name = "Docker: Attach to lldb-server",
-		type = "codelldb",
+		type = "lldb",
 		request = "attach",
 		port = 1234,
 		host = "localhost",

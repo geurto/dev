@@ -56,7 +56,6 @@ with pkgs.vimPlugins;
   nvim-notify
   nvim-web-devicons
   plenary-nvim
-  rustaceanvim
   telescope-fzf-native-nvim
   telescope-nvim
   todo-comments-nvim

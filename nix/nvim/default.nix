@@ -28,7 +28,6 @@ let
     "nvim-lspconfig.lua"
     "nvim-notify.lua"
     "nvim-treesitter.lua"
-    "rustaceanvim.lua"
     "telescope.lua"
     "todo-comments.lua"
     "trouble.lua"
