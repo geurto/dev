@@ -52,6 +52,7 @@ let
     prettierd
     pyright
     ripgrep
+    ruff
     rust-analyzer
     spdlog
     stow
