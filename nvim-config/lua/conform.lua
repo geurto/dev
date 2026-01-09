@@ -1,7 +1,7 @@
 require("conform").setup({
 	formatters_by_ft = {
 		lua = { "stylua" },
-		python = { "ruff_format" },
+		python = { "ruff_format", "ruff_organize_imports" },
 		javascript = { "prettierd", "prettier", stop_after_first = true },
 		nix = { "nixfmt" },
 		rust = {
@@ -24,9 +24,50 @@ require("conform").setup({
 		lsp_format = "fallback",
 	},
 	formatters = {
-		ruff_fix = {
+		ruff_format = {
 			command = "ruff",
-			args = { "check", "--fix", "--stdin-filename", "$FILENAME", "-" },
+			args = function()
+				local config_path = vim.fs.find("pyproject.toml", {
+					upward = true,
+					path = vim.fn.expand("%:p:h"),
+				})[1]
+
+				local base_args = { "format", "--stdin-filename", "$FILENAME", "-" }
+
+				if config_path then
+					return { "format", "--config", config_path, "--stdin-filename", "$FILENAME", "-" }
+				else
+					return base_args
+				end
+			end,
+			stdin = true,
+		},
+		ruff_organize_imports = {
+			command = "ruff",
+			args = function()
+				local config_path = vim.fs.find("pyproject.toml", {
+					upward = true,
+					path = vim.fn.expand("%:p:h"),
+				})[1]
+
+				local base_args = { "check", "--select", "I", "--fix", "--stdin-filename", "$FILENAME", "-" }
+
+				if config_path then
+					return {
+						"check",
+						"--select",
+						"I",
+						"--fix",
+						"--config",
+						config_path,
+						"--stdin-filename",
+						"$FILENAME",
+						"-",
+					}
+				else
+					return base_args
+				end
+			end,
 			stdin = true,
 		},
 		shfmt = {
