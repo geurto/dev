@@ -20,9 +20,10 @@ let
       set -g history-limit 10000
 
       # Set terminal
-      set -g default-terminal "tmux-256color"
-      set -as terminal-features ',alacritty:RGB'
-      set -as terminal-overrides ',alacritty:Tc'
+      set -g default-terminal "screen-256color"
+      set -ga terminal-overrides ",*256col*:Tc"
+      set -ga terminal-overrides ",alacritty:Tc"
+      set -as terminal-features ",*:RGB"
 
       # Customize status bar
       set -g status-style bg=black,fg=white
