@@ -23,6 +23,9 @@ if vim.fn.empty(vim.fn.glob(plug_path)) > 0 then
 	print("Installed vim-plug and plugins!")
 end
 
+vim.opt.termguicolors = true
+vim.cmd("colorscheme catppuccin-mocha")
+
 local Plug = vim.fn["plug#"]
 vim.call("plug#begin")
 

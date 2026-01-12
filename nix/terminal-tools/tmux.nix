@@ -21,7 +21,8 @@ let
 
       # Set terminal
       set -g default-terminal "tmux-256color"
-      set -ga terminal-overrides ",xterm-256color:Tc"
+      set -as terminal-features ',alacritty:RGB'
+      set -as terminal-overrides ',alacritty:Tc'
 
       # Customize status bar
       set -g status-style bg=black,fg=white
