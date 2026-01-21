@@ -46,6 +46,12 @@ let
       if [[ -f ~/.zshrc ]]; then
         source ~/.zshrc
       fi
+
+      # show shell lvl if greater than 2 (tmux + zsh)
+      if [[ "''$SHLVL" -gt "2" ]]; then
+        SHLVL_STR="[''$SHLVL] "
+      fi
+      export PS1="$SHLVL_STR''$PS1"
     '';
   };
 
