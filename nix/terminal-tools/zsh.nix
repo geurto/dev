@@ -26,9 +26,6 @@ let
       }
       check_disk_space
 
-      # show shell lvl before username
-      export PS1=''${PS1//\\u/"$SHLVL:\\u"}
-
       # docker container output to screen
       xhost +local:docker > /dev/null 2>&1 || true
 
