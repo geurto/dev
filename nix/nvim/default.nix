@@ -14,7 +14,6 @@ let
     "catppuccin.lua"
     "conform.lua"
     "cpp.lua"
-    "diffview.lua"
     "gitsigns.lua"
     "harpoon.lua"
     "lazygit.lua"
