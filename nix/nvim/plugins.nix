@@ -21,6 +21,7 @@ with pkgs.vimPlugins;
   cmp-path
   cmp_luasnip
   conform-nvim
+  diffview-nvim
   gitsigns-nvim
   (pkgs.vimUtils.buildVimPlugin {
     pname = "harpoon";
