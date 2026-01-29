@@ -65,6 +65,7 @@ sudo apt install -y \
   arandr \
   autorandr \
   maim \
+  peek \
   xclip \
   xdotool \
   rofi \
