@@ -54,6 +54,7 @@ let
     ripgrep
     ruff
     rust-analyzer
+    sshfs
     spdlog
     stow
     stylua

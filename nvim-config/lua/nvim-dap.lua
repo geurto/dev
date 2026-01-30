@@ -1,5 +1,6 @@
 local dap = require("dap")
 
+-- Keymaps
 vim.keymap.set("n", "<leader>d", "<nop>", { desc = "Debug" })
 vim.keymap.set("n", "<leader>dc", dap.continue, { desc = "Continue" })
 vim.keymap.set("n", "<leader>db", dap.toggle_breakpoint, { desc = "Toggle Breakpoint" })
@@ -10,22 +11,16 @@ vim.keymap.set("n", "<leader>dr", dap.repl.open, { desc = "Open REPL" })
 vim.keymap.set("n", "<leader>dl", dap.run_last, { desc = "Run Last" })
 vim.keymap.set("n", "<leader>dt", dap.terminate, { desc = "Terminate" })
 
+-- Helper function to get remote host
 local function get_remote_host()
 	local default = os.getenv("REMOTE_HOST") or "remote"
 	local input = vim.fn.input("Remote host: ", default)
 	return input ~= "" and input or default
 end
 
-local function remote_path_mappings(remote_root)
-	remote_root = remote_root or "/root"
-	return {
-		{
-			localRoot = vim.fn.getcwd(),
-			remoteRoot = remote_root,
-		},
-	}
-end
-
+-- ==================================================================================
+-- Adapters
+-- ==================================================================================
 dap.adapters.cppdbg = {
 	id = "cppdbg",
 	type = "executable",
@@ -33,12 +28,8 @@ dap.adapters.cppdbg = {
 }
 
 dap.adapters.python = function(cb, config)
-	local dap_path = vim.fn.trim(vim.fn.system("which python"))
-
 	if config.request == "attach" then
-		---@diagnostic disable-next-line: undefined-field
 		local port = (config.connect or config).port
-		---@diagnostic disable-next-line: undefined-field
 		local host = (config.connect or config).host or "127.0.0.1"
 		cb({
 			type = "server",
@@ -51,7 +42,7 @@ dap.adapters.python = function(cb, config)
 	else
 		cb({
 			type = "executable",
-			command = dap_path,
+			command = vim.fn.trim(vim.fn.system("which python")),
 			args = { "-m", "debugpy.adapter" },
 			options = {
 				source_filetype = "python",
@@ -75,6 +66,9 @@ dap.adapters.delve = {
 	},
 }
 
+-- ==================================================================================
+-- Configurations
+-- ==================================================================================
 dap.configurations.cpp = {
 	{
 		name = "Local: launch",
@@ -95,7 +89,7 @@ dap.configurations.cpp = {
 	},
 
 	{
-		name = "Docker: Attach to gdbserver",
+		name = "Docker: attach gdbserver (localhost:1234)",
 		type = "cppdbg",
 		request = "launch",
 		MIMode = "gdb",
@@ -114,6 +108,28 @@ dap.configurations.cpp = {
 			["/app"] = "${workspaceFolder}",
 		},
 	},
+	{
+		name = "Remote: attach gdbserver",
+		type = "cppdbg",
+		request = "launch",
+		MIMode = "gdb",
+		miDebuggerServerAddress = function()
+			return get_robot_host() .. ":1234"
+		end,
+		miDebuggerPath = vim.fn.exepath("gdb") or "/usr/bin/gdb",
+		cwd = "${workspaceFolder}",
+		program = function()
+			return vim.fn.input("Path to executable (for symbols): ", vim.fn.getcwd() .. "/", "file")
+		end,
+		setupCommands = {
+			{ text = "-enable-pretty-printing", description = "enable pretty printing", ignoreFailures = false },
+			{ text = "set sysroot /", description = "set sysroot for remote", ignoreFailures = true },
+		},
+		sourceFileMap = function()
+			local remote = vim.fn.input("Remote source root: ", "/root")
+			return { [remote] = vim.fn.getcwd() }
+		end,
+	},
 }
 
 dap.configurations.c = dap.configurations.cpp
@@ -130,7 +146,7 @@ dap.configurations.rust = {
 		stopOnEntry = false,
 	},
 	{
-		name = "Docker: Attach to lldb-server",
+		name = "Docker: attach lldb-server (localhost:1234)",
 		type = "lldb",
 		request = "attach",
 		port = 1234,
@@ -139,13 +155,26 @@ dap.configurations.rust = {
 			["/app"] = "${workspaceFolder}",
 		},
 	},
+	{
+		name = "Remote: attach lldb-server",
+		type = "lldb",
+		request = "attach",
+		port = 1234,
+		host = function()
+			return get_remote_host()
+		end,
+		sourceMap = function()
+			local remote = vim.fn.input("Remote source root: ", "/root")
+			return { [remote] = vim.fn.getcwd() }
+		end,
+	},
 }
 
 dap.configurations.python = {
 	{
 		type = "python",
 		request = "launch",
-		name = "Local: launch",
+		name = "Local: launch file",
 		program = "${file}",
 		pythonPath = function()
 			local cwd = vim.fn.getcwd()
@@ -158,12 +187,11 @@ dap.configurations.python = {
 			end
 		end,
 		console = "integratedTerminal",
-		redirectOutput = true,
-		justmyCode = false,
+		justMyCode = false,
 	},
 
 	{
-		name = "Docker: Remote Attach",
+		name = "Docker: attach (localhost:5678)",
 		type = "python",
 		request = "attach",
 		connect = {
@@ -176,6 +204,20 @@ dap.configurations.python = {
 				remoteRoot = "/app",
 			},
 		},
+		justMyCode = false,
+	},
+
+	{
+		type = "python",
+		request = "attach",
+		name = "Remote: attach (debugpy)",
+		connect = function()
+			return { host = get_remote_host(), port = 5678 }
+		end,
+		pathMappings = function()
+			local remote = vim.fn.input("Remote root path: ", "/root")
+			return { { localRoot = vim.fn.getcwd(), remoteRoot = remote } }
+		end,
 		justMyCode = false,
 	},
 }
