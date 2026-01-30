@@ -10,6 +10,22 @@ vim.keymap.set("n", "<leader>dr", dap.repl.open, { desc = "Open REPL" })
 vim.keymap.set("n", "<leader>dl", dap.run_last, { desc = "Run Last" })
 vim.keymap.set("n", "<leader>dt", dap.terminate, { desc = "Terminate" })
 
+local function get_remote_host()
+	local default = os.getenv("REMOTE_HOST") or "remote"
+	local input = vim.fn.input("Remote host: ", default)
+	return input ~= "" and input or default
+end
+
+local function remote_path_mappings(remote_root)
+	remote_root = remote_root or "/root"
+	return {
+		{
+			localRoot = vim.fn.getcwd(),
+			remoteRoot = remote_root,
+		},
+	}
+end
+
 dap.adapters.cppdbg = {
 	id = "cppdbg",
 	type = "executable",
