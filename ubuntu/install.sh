@@ -73,6 +73,8 @@ sudo apt install -y \
   lightdm \
   xautolock \
   redshift
+# Polybar extensions
+sudo git clone https://github.com/unode/polypomo.git /opt/polypomo
 
 echo "---------- Installing i3lock-color ----------"
 sudo apt install -y \
