@@ -31,7 +31,7 @@ lspconfig.clangd.setup({
 		"--function-arg-placeholders",
 	},
 	init_options = {
-		compilationDatabasePath = ".clangd-build",
+		compilationDatabasePath = ".nvim/clangd",
 	},
 	on_attach = function(client, bufnr)
 		client.server_capabilities.signatureHelpProvider = false

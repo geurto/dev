@@ -55,6 +55,7 @@ with pkgs.vimPlugins;
   nvim-lspconfig
   nvim-notify
   nvim-web-devicons
+  overseer-nvim
   plenary-nvim
   telescope-fzf-native-nvim
   telescope-nvim
