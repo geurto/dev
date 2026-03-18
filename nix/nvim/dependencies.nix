@@ -12,11 +12,17 @@ let
     nativeBuildInputs = [ pkgs.makeWrapper ];
   };
 
-  cpptools = pkgs.runCommand "vscode-cpptools-extracted" { } ''
-    mkdir -p $out/bin
-    cp -r ${vscode-extensions.ms-vscode.cpptools}/share/vscode/extensions/ms-vscode.cpptools/debugAdapters/bin/* $out/bin/
-    chmod +x $out/bin/*
-  '';
+  # cpptools only ships x86_64 binaries; skip on aarch64 (e.g. Jetson)
+  cpptoolsPackages = pkgs.lib.optionals pkgs.stdenv.hostPlatform.isx86_64 (
+    let
+      cpptools = pkgs.runCommand "vscode-cpptools-extracted" { } ''
+        mkdir -p $out/bin
+        cp -r ${vscode-extensions.ms-vscode.cpptools}/share/vscode/extensions/ms-vscode.cpptools/debugAdapters/bin/* $out/bin/
+        chmod +x $out/bin/*
+      '';
+    in
+    [ cpptools vscode-extensions.ms-vscode.cpptools ]
+  );
 
   packages = [
     bat
@@ -25,7 +31,6 @@ let
     cargo-nextest
     ccls
     clang-tools
-    cpptools
     curl
     delve
     fzf
@@ -61,14 +66,13 @@ let
     tmux
     tmuxPlugins.sensible
     tmuxPlugins.catppuccin
-    vscode-extensions.ms-vscode.cpptools
     wget
     xclip
     xdotool
     xorg.xhost
     xsel
     zsh
-  ];
+  ] ++ cpptoolsPackages;
 in
 {
   inherit

@@ -341,6 +341,7 @@ local function pick_and_debug(root)
 
 		local adapter_name = dap.adapters.codelldb and "codelldb"
 			or dap.adapters.cppdbg and "cppdbg"
+			or dap.adapters.lldb and "lldb"
 			or dap.adapters.gdb and "gdb"
 			or nil
 

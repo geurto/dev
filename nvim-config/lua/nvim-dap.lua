@@ -21,11 +21,14 @@ end
 -- ==================================================================================
 -- Adapters
 -- ==================================================================================
-dap.adapters.cppdbg = {
-	id = "cppdbg",
-	type = "executable",
-	command = vim.fn.exepath("OpenDebugAD7"),
-}
+local openDebugAD7 = vim.fn.exepath("OpenDebugAD7")
+if openDebugAD7 ~= "" then
+	dap.adapters.cppdbg = {
+		id = "cppdbg",
+		type = "executable",
+		command = openDebugAD7,
+	}
+end
 
 dap.adapters.python = function(cb, config)
 	if config.request == "attach" then
@@ -71,7 +74,17 @@ dap.adapters.delve = {
 -- ==================================================================================
 dap.configurations.cpp = {
 	{
-		name = "Local: launch",
+		name = "Local: launch (lldb)",
+		type = "lldb",
+		request = "launch",
+		program = function()
+			return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+		end,
+		cwd = "${workspaceFolder}",
+		stopOnEntry = false,
+	},
+	{
+		name = "Local: launch (cppdbg)",
 		type = "cppdbg",
 		request = "launch",
 		program = function()
