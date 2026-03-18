@@ -6,8 +6,8 @@
 --
 -- Directory layout assumed:
 --   <repo-root>/
---     .nvim/clangd/            -- out-of-source build dir (created automatically)
---     .nvim/clangd/build_setup.sh  -- optional: extra env setup (e.g. source ROS2)
+--     .nvim/clangd/                -- out-of-source build dir (created automatically)
+--     .nvim/dev/build_setup.sh      -- optional: extra env setup (e.g. source ROS2)
 --     pkg_a/CMakeLists.txt
 --     pkg_b/CMakeLists.txt
 --     ...
@@ -205,23 +205,31 @@ end
 --- Called inside the build script so only cmake/make/gcc see these —
 --- the parent shell/dynamic linker is unaffected.
 ---
---- These REPLACE (not append to) any existing values, because the process
---- env has been scrubbed of Nix-injected paths by docker_build_env().
+--- IMPORTANT: We only set LD_LIBRARY_PATH and LIBRARY_PATH here.
+--- We do NOT set C_INCLUDE_PATH or CPLUS_INCLUDE_PATH because GCC
+--- already knows where its system headers are. Setting these variables
+--- inserts paths into GCC's search order between the C++ standard library
+--- headers and the C system headers, which breaks #include_next chains
+--- (e.g. /usr/include/c++/13/cstdlib -> #include_next <stdlib.h> fails
+--- because the injected path position causes the search to skip past
+--- /usr/include/stdlib.h).
+---
+--- The Nix-contaminated values are already cleared to "" by
+--- docker_build_env() in the process env — that's sufficient.
 ---@return string
 local function lib_path_exports()
 	local arch = detect_multiarch()
 	return string.format(
-		[[# Set clean library/include paths for the system compiler.
-# These replace any inherited values (Nix-injected paths are scrubbed).
+		[[# Set clean library paths for the system linker.
+# NOTE: C_INCLUDE_PATH and CPLUS_INCLUDE_PATH are intentionally left unset.
+# GCC knows its own system include paths. Setting these variables breaks
+# #include_next in the C++ standard library headers.
 export LD_LIBRARY_PATH="/usr/lib/%s"
 export LIBRARY_PATH="/usr/lib/%s"
-export CPLUS_INCLUDE_PATH="/usr/include/%s:/usr/include"
-export C_INCLUDE_PATH="/usr/include/%s:/usr/include"
-# Also unset Nix compiler wrapper variables in case they leaked through
+# Unset Nix compiler wrapper variables in case they leaked through
 unset NIX_CFLAGS_COMPILE NIX_LDFLAGS NIX_CC_WRAPPER_TARGET_HOST NIX_BINTOOLS_WRAPPER_TARGET_HOST 2>/dev/null || true
+unset C_INCLUDE_PATH CPLUS_INCLUDE_PATH 2>/dev/null || true
 ]],
-		arch,
-		arch,
 		arch,
 		arch
 	)
@@ -234,12 +242,14 @@ end
 ---@return string
 local function cmake_build_cmd(root, pkg_path, in_docker)
 	local build_dir = root .. "/.nvim/clangd"
-	local setup_file = "build_setup.sh"
+	local setup_file = root .. "/.nvim/dev/build_setup.sh"
 	local source_cmd = ""
 	local lib_exports = ""
 
-	if vim.fn.filereadable(build_dir .. "/" .. setup_file) == 1 then
-		source_cmd = string.format('source "%s/%s" && ', build_dir, setup_file)
+	if vim.fn.filereadable(setup_file) == 1 then
+		source_cmd = string.format('source "%s" && ', setup_file)
+	else
+		vim.notify("No setup file found (<repo_root>/.nvim/dev/build_setup.sh)", vim.log.levels.INFO)
 	end
 
 	if in_docker then
@@ -258,19 +268,15 @@ echo "  CPLUS_INCLUDE_PATH=${CPLUS_INCLUDE_PATH:-<unset>}"
 echo "  LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-<unset>}"
 echo "  CC=$(which cc 2>/dev/null || echo '<not found>')"
 echo "  CXX=$(which c++ 2>/dev/null || echo '<not found>')"
+
 BUILD_DIR="%s"
 PKG_DIR="%s"
 ROOT_DIR="%s"
 
+# Clean and recreate build dir
+rm -rf "$BUILD_DIR"
 mkdir -p "$BUILD_DIR"
 cd "$BUILD_DIR"
-
-# Clean previous build artifacts but keep build_setup.sh
-find . -maxdepth 1 -type f -not -name '%s' -delete 2>/dev/null || true
-# Only remove subdirs if any exist (avoids glob failure under set -e)
-if ls -d */ >/dev/null 2>&1; then
-    rm -rf */
-fi
 
 echo "=== Running CMake configure ==="
 %scmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug "$PKG_DIR"
@@ -287,7 +293,6 @@ echo "=== Build finished successfully ==="]],
 		build_dir,
 		pkg_path,
 		root,
-		setup_file,
 		source_cmd
 	)
 end
@@ -456,12 +461,14 @@ local function run_configure()
 
 	pick_package(pkgs, function(pkg)
 		local build_dir = root .. "/.nvim/clangd"
-		local setup_file = "build_setup.sh"
+		local setup_file = root .. "/.nvim/dev/build_setup.sh"
 		local source_cmd = ""
 		local lib_exports = ""
 
-		if vim.fn.filereadable(build_dir .. "/" .. setup_file) == 1 then
-			source_cmd = string.format('source "%s/%s" && ', build_dir, setup_file)
+		if vim.fn.filereadable(setup_file) == 1 then
+			source_cmd = string.format('source "%s" && ', setup_file)
+		else
+			vim.notify("No setup file found (<repo_root>/.nvim/dev/build_setup.sh)", vim.log.levels.INFO)
 		end
 		if in_docker then
 			lib_exports = lib_path_exports()
