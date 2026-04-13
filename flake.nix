@@ -46,6 +46,11 @@
           };
           default = self.apps.${system}.neovim;
         };
+        # Expose a helper so the NixOS flake (nixos/flake.nix) can consume shared
+        # terminal config without duplicating it.  Call as:
+        #   inputs.dev.lib.${system}.makeTerminalConfig pkgs
+        lib.makeTerminalConfig = callerPkgs:
+          import ./nix/terminal-tools/config.nix { pkgs = callerPkgs; };
       }
     );
 }
