@@ -174,6 +174,8 @@ in
 
       input {
         follow_mouse = 1
+        kb_layout    = us
+        kb_variant   = intl
         touchpad {
           natural_scroll = true
           tap-to-click   = true
@@ -361,7 +363,7 @@ in
         };
 
         clock = {
-          format = "%Y-%m-%d  %H:%M";
+          format = "{:%Y-%m-%d  %H:%M}";
           tooltip-format = "<big>{:%B %Y}</big>\n<tt><small>{calendar}</small></tt>";
         };
 

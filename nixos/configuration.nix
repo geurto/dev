@@ -1,4 +1,9 @@
-{ config, pkgs, inputs, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
 
 {
   # ── Bootloader ────────────────────────────────────────────────────────────
@@ -39,7 +44,7 @@
   # ── Graphics ──────────────────────────────────────────────────────────────
   hardware.graphics.enable = true;
   # Uncomment one of the following if you have a discrete GPU:
-  hardware.nvidia.modesetting.enable = true;   # NVIDIA
+  hardware.nvidia.modesetting.enable = true; # NVIDIA
   # hardware.amdgpu.enable = true;               # AMD
 
   # ── Audio (PipeWire) ──────────────────────────────────────────────────────
@@ -57,7 +62,13 @@
   users.users.peter = {
     isNormalUser = true;
     description = "Peter";
-    extraGroups = [ "wheel" "networkmanager" "dialout" "docker" "plugdev" ];
+    extraGroups = [
+      "wheel"
+      "networkmanager"
+      "dialout"
+      "docker"
+      "plugdev"
+    ];
     shell = pkgs.zsh;
   };
 
@@ -74,15 +85,15 @@
     unzip
 
     # Hyprland
-    waybar          # status bar
-    wofi            # app launcher (or rofi-wayland)
-    hyprpaper       # wallpaper
-    hypridle        # idle management
-    hyprlock        # screen locker
-    dunst           # notifications
-    wl-clipboard    # clipboard for Wayland
-    grim            # screenshots
-    slurp           # region selector for screenshots
+    waybar # status bar
+    wofi # app launcher (or rofi-wayland)
+    hyprpaper # wallpaper
+    hypridle # idle management
+    hyprlock # screen locker
+    dunst # notifications
+    wl-clipboard # clipboard for Wayland
+    grim # screenshots
+    slurp # region selector for screenshots
 
     # Rust toolchain (you'll likely want rustup for project-level control)
     rustup
@@ -99,6 +110,9 @@
     # MIDI / audio tools relevant to your sequencer work
     alsa-utils
     jack2
+
+    # File manager
+    nautilus
 
     # Claude code
     claude-code
@@ -124,7 +138,10 @@
 
   # ── Nix settings ──────────────────────────────────────────────────────────
   nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
     auto-optimise-store = true;
   };
   nix.gc = {
