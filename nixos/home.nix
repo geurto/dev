@@ -1,4 +1,10 @@
-{ config, pkgs, inputs, system, ... }:
+{
+  config,
+  pkgs,
+  inputs,
+  system,
+  ...
+}:
 
 let
   # Neovim built by the dev flake (same config as Ubuntu)
@@ -13,7 +19,11 @@ in
   home.stateVersion = "25.05";
 
   # ── Packages ──────────────────────────────────────────────────────────────
-  home.packages = [ neovim ] ++ termConfig.extraPackages ++ (with pkgs; [
+  home.packages = [
+    neovim
+  ]
+  ++ termConfig.extraPackages
+  ++ (with pkgs; [
     # Networking / infra (alongside Tailscale)
     nmap
     wireguard-tools
@@ -36,7 +46,7 @@ in
       theme = "Catppuccin Mocha";
       window-decoration = "none";
       background-opacity = 0.95;
-      cursor-style = "bar";
+      cursor-style = "block";
       shell-integration = "zsh";
     };
   };
@@ -51,8 +61,8 @@ in
     shellAliases = termConfig.shellAliases // {
       # NixOS-specific helpers (not relevant on Ubuntu)
       rebuild = "sudo nixos-rebuild switch --flake .#nixos";
-      update  = "nix flake update && sudo nixos-rebuild switch --flake .#nixos";
-      ros     = "source /opt/ros/jazzy/setup.zsh";
+      update = "nix flake update && sudo nixos-rebuild switch --flake .#nixos";
+      ros = "source /opt/ros/jazzy/setup.zsh";
     };
 
     initContent = termConfig.zshInitExtra;
@@ -75,18 +85,29 @@ in
   programs.git = {
     enable = true;
     settings = {
-      user.name  = "Peter";
+      user.name = "Peter";
       user.email = "your@email.com"; # fill in
       core.pager = "delta";
       interactive.diffFilter = "delta --color-only";
       delta = {
-        navigate     = true;
+        navigate = true;
         line-numbers = true;
         side-by-side = true;
       };
       merge.conflictstyle = "zdiff3";
       pull.rebase = true;
     };
+  };
+
+  # ── SSH agent (systemd user service) ────────────────────────────────────
+  services.ssh-agent.enable = true;
+
+  # Force SSH/git to prompt in the terminal instead of spawning a GUI dialog.
+  # Without this, SSH_ASKPASS may be picked up from the system (e.g. via
+  # gnome-keyring started by PAM/SDDM) and open a popup that blocks paste.
+  home.sessionVariables = {
+    SSH_ASKPASS = "";
+    GIT_TERMINAL_PROMPT = "1";
   };
 
   # ── SSH ───────────────────────────────────────────────────────────────────
@@ -97,6 +118,18 @@ in
       addKeysToAgent = "yes";
       serverAliveInterval = 60;
       serverAliveCountMax = 3;
+    };
+  };
+
+  # ── Cursor ────────────────────────────────────────────────────────────────
+  home.pointerCursor = {
+    gtk.enable = true;
+    package = pkgs.adwaita-icon-theme;
+    name = "Adwaita";
+    size = 24;
+    hyprcursor = {
+      enable = true;
+      size = 24;
     };
   };
 
@@ -111,6 +144,10 @@ in
   wayland.windowManager.hyprland = {
     enable = true;
     extraConfig = ''
+      # ── Cursor ────────────────────────────────────────────────────────────
+      env = XCURSOR_THEME,Adwaita
+      env = XCURSOR_SIZE,24
+
       # ── General ───────────────────────────────────────────────────────────
       general {
         border_size        = 1
@@ -122,8 +159,10 @@ in
       }
 
       decoration {
-        rounding    = 0
-        drop_shadow = false
+        rounding = 0
+        shadow {
+          enabled = false
+        }
         blur {
           enabled = false
         }
@@ -294,67 +333,66 @@ in
       bind  = , return, submap, reset
       bind  = , escape, submap, reset
       submap = reset
-
-      # ── Floating window rules ─────────────────────────────────────────────
-      windowrule = float, class:^(Pavucontrol)$
-      windowrule = float, class:^(Galculator)$
-      windowrule = float, class:^(GParted)$
-      windowrule = float, class:^(Skype)$
-      windowrule = float, title:^(alsamixer)$
-      windowrule = float, class:^(nm-connection-editor)$
     '';
   };
 
   # ── Waybar ──────────────────────────────────────────────────────────────
   programs.waybar = {
     enable = true;
-    settings = [{
-      layer    = "top";
-      position = "top";
-      height   = 24;
+    settings = [
+      {
+        layer = "top";
+        position = "top";
+        height = 24;
 
-      modules-left   = [ "hyprland/workspaces" ];
-      modules-center = [ "clock" ];
-      modules-right  = [ "pulseaudio" "network" "battery" "tray" ];
+        modules-left = [ "hyprland/workspaces" ];
+        modules-center = [ "clock" ];
+        modules-right = [
+          "pulseaudio"
+          "network"
+          "battery"
+          "tray"
+        ];
 
-      "hyprland/workspaces" = {
-        format   = "{id}";
-        on-click = "activate";
-        sort-by-number = true;
-      };
-
-      clock = {
-        format         = "%Y-%m-%d  %H:%M";
-        tooltip-format = "<big>{:%B %Y}</big>\n<tt><small>{calendar}</small></tt>";
-      };
-
-      pulseaudio = {
-        format        = " {volume}%";
-        format-muted  = " muted";
-        on-click      = "pavucontrol";
-        scroll-step   = 5;
-      };
-
-      network = {
-        format-wifi        = " {essid} ({signalStrength}%)";
-        format-ethernet    = " eth";
-        format-disconnected = " disconnected";
-        tooltip-format     = "{ifname}: {ipaddr}";
-      };
-
-      battery = {
-        format          = " {capacity}%";
-        format-charging = " {capacity}%";
-        states = {
-          warning  = 30;
-          critical = 15;
+        "hyprland/workspaces" = {
+          format = "{id}";
+          on-click = "activate";
+          sort-by-number = true;
         };
-      };
 
-      tray = {
-        spacing = 8;
-      };
-    }];
+        clock = {
+          format = "%Y-%m-%d  %H:%M";
+          tooltip-format = "<big>{:%B %Y}</big>\n<tt><small>{calendar}</small></tt>";
+        };
+
+        pulseaudio = {
+          format = " {volume}%";
+          format-muted = " muted";
+          on-click = "pavucontrol";
+          scroll-step = 5;
+        };
+
+        network = {
+          format-wifi = " {essid} ({signalStrength}%)";
+          format-ethernet = " eth";
+          format-disconnected = " disconnected";
+          tooltip-format = "{ifname}: {ipaddr}";
+        };
+
+        battery = {
+          format = " {capacity}%";
+          format-charging = " {capacity}%";
+          states = {
+            warning = 30;
+            critical = 15;
+          };
+        };
+
+        tray = {
+          spacing = 8;
+        };
+      }
+    ];
 
     style = ''
       * {
@@ -419,17 +457,17 @@ in
     enable = true;
     settings = {
       global = {
-        width             = 300;
-        height            = 200;
-        offset            = "20x40";
-        origin            = "top-right";
-        frame_width       = 1;
-        frame_color       = "#657b83";
-        font              = "JetBrainsMono Nerd Font 11";
-        background        = "#272827";
-        foreground        = "#657b83";
-        timeout           = 5;
-        corner_radius     = 0;
+        width = 300;
+        height = 200;
+        offset = "20x40";
+        origin = "top-right";
+        frame_width = 1;
+        frame_color = "#657b83";
+        font = "JetBrainsMono Nerd Font 11";
+        background = "#272827";
+        foreground = "#657b83";
+        timeout = 5;
+        corner_radius = 0;
       };
     };
   };
@@ -439,17 +477,17 @@ in
     enable = true;
     settings = {
       general = {
-        after_sleep_cmd     = "hyprctl dispatch dpms on";
+        after_sleep_cmd = "hyprctl dispatch dpms on";
         ignore_dbus_inhibit = false;
-        lock_cmd            = "hyprlock";
+        lock_cmd = "hyprlock";
       };
       listener = [
         {
-          timeout    = 600;   # 10 min: lock
+          timeout = 600; # 10 min: lock
           on-timeout = "hyprlock";
         }
         {
-          timeout    = 900;   # 15 min: suspend
+          timeout = 900; # 15 min: suspend
           on-timeout = "systemctl suspend";
         }
       ];
