@@ -27,7 +27,15 @@
   # ── Desktop (Wayland / GNOME) ─────────────────────────────────────────────
   services.xserver.enable = true;
   services.xserver.displayManager.gdm.enable = true;
-  services.xserver.desktopManager.gnome.enable = true;
+  services.displayManager.sddm = {
+    enable = true;
+    wayland.enable = true;
+  };
+
+  programs.hyprland = {
+    enable = true;
+    xwayland.enable = true; # for running X11 apps
+  };
 
   # ── Graphics ──────────────────────────────────────────────────────────────
   hardware.graphics.enable = true;
@@ -66,11 +74,25 @@
     htop
     unzip
 
+    # Hyprland
+    waybar          # status bar
+    wofi            # app launcher (or rofi-wayland)
+    hyprpaper       # wallpaper
+    hypridle        # idle management
+    hyprlock        # screen locker
+    dunst           # notifications
+    wl-clipboard    # clipboard for Wayland
+    grim            # screenshots
+    slurp           # region selector for screenshots
+
     # Rust toolchain (you'll likely want rustup for project-level control)
     rustup
 
     # Docker (handy for your ROS2 containers)
     docker
+
+    # Firefox
+    firefox
 
     # GIMP
     gimp3
