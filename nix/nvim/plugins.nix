@@ -29,7 +29,7 @@ with pkgs.vimPlugins;
       owner = "ThePrimeagen";
       repo = "harpoon";
       rev = "harpoon2";
-      sha256 = "sha256-L7FvOV6KvD58BnY3no5IudiKTdgkGqhpS85RoSxtl7U=";
+      sha256 = "sha256-qQSPVMdldksNZDPZvnTiXxty+GSUqMGz8nYEFDRezrQ=";
     };
     nvimSkipModule = [
       "harpoon.data"

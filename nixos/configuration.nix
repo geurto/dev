@@ -24,9 +24,8 @@
   time.timeZone = "Europe/Warsaw"; # adjust as needed
   i18n.defaultLocale = "en_GB.UTF-8";
 
-  # ── Desktop (Wayland / GNOME) ─────────────────────────────────────────────
+  # ── Desktop (Wayland / Hyprland) ──────────────────────────────────────────
   services.xserver.enable = true;
-  services.xserver.displayManager.gdm.enable = true;
   services.displayManager.sddm = {
     enable = true;
     wayland.enable = true;
@@ -44,7 +43,7 @@
   # hardware.amdgpu.enable = true;               # AMD
 
   # ── Audio (PipeWire) ──────────────────────────────────────────────────────
-  hardware.pulseaudio.enable = false;
+  services.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
