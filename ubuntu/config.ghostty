@@ -1,0 +1,8 @@
+font-family = JetBrainsMono Nerd Font
+font-size = 12
+theme = Everforest Dark Hard
+background-opacity = 0.95
+cursor-style = block
+command = /home/peter/.nix-profile/bin/zsh
+shell-integration = zsh
+mouse-scroll-multiplier = 1.0

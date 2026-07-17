@@ -1,0 +1,170 @@
+/* Everforest Dark Hard — Floating Glass Pills
+ *
+ * Palette:
+ *   bg_hard  #1e2326   bg1  #2e383c   fg    #d3c6aa
+ *   red      #e67e80   orange #e69875  yellow #dbbc7f
+ *   green    #a7c080   aqua  #83c092  blue  #7fbbb3
+ *   purple   #d699b6   grey  #859289
+ */
+
+window#waybar {
+    background: transparent;
+}
+
+/* ── Pill containers ───────────────────────────────────────────────── */
+
+.modules-left,
+.modules-center,
+.modules-right {
+    background: #1e2326;
+    border-radius: 18px;
+    padding: 3px 8px;
+    margin: 3px 3px;
+}
+
+/* ── Left pill ─────────────────────────────────────────────────────── */
+
+#clock {
+    color: #dbbc7f;
+    font-weight: 700;
+    padding: 3 10px;
+    background: rgba(219, 188, 127, 0.1);
+    border-radius: 18px;
+    margin: 3px 0;
+}
+
+#network {
+    color: #7fbbb3;
+    padding: 3 8px;
+}
+
+#network.disconnected {
+    color: #e67e80;
+}
+
+#bluetooth {
+    color: #7fbbb3;
+    padding: 3 8px;
+}
+
+#bluetooth.disabled {
+    color: #859289;
+}
+
+/* Hyprland window title */
+#window {
+    color: #9da9a0;
+    padding: 3 8px;
+    font-style: italic;
+}
+
+/* ── Center pill ───────────────────────────────────────────────────── */
+
+#workspaces {
+    background: transparent;
+}
+
+#workspaces button {
+    color: rgba(157, 169, 160, 0.45);
+    padding: 3 10px;
+    margin: 3px 2px;
+    border-radius: 16px;
+    background: transparent;
+    border: none;
+    transition: all 0.25s ease;
+}
+
+#workspaces button.active {
+    color: #1e2326;
+    background: #a7c080;
+    min-width: 40px;
+}
+
+#workspaces button.urgent {
+    color: #1e2326;
+    background: #e67e80;
+}
+
+#workspaces button:hover {
+    color: #d3c6aa;
+    background: rgba(157, 169, 160, 0.15);
+}
+
+#backlight {
+    color: #dbbc7f;
+    padding: 3 8px;
+}
+
+#pulseaudio {
+    color: #83c092;
+    padding: 3 8px;
+}
+
+#pulseaudio.muted {
+    color: #e67e80;
+}
+
+/* ── Right pill ────────────────────────────────────────────────────── */
+
+#cpu {
+    color: #7fbbb3;
+    padding: 3 8px;
+}
+
+#memory {
+    color: #d699b6;
+    padding: 3 8px;
+}
+
+#custom-gpu {
+    color: #e69875;
+    padding: 3 8px;
+}
+
+#disk {
+    color: #a7c080;
+    padding: 3 8px;
+}
+
+#network.traffic {
+    color: #83c092;
+    padding: 3 8px;
+}
+
+#battery {
+    color: #a7c080;
+    padding: 3 8px;
+}
+
+#battery.warning {
+    color: #dbbc7f;
+}
+
+#battery.critical {
+    color: #e67e80;
+}
+
+#battery.charging {
+    color: #83c092;
+}
+
+#tray {
+    padding: 3 8px;
+    margin-left: 4px;
+}
+
+/* ── Hover glow ────────────────────────────────────────────────────── */
+
+#pulseaudio:hover,
+#network:hover,
+#bluetooth:hover,
+#backlight:hover,
+#battery:hover,
+#cpu:hover,
+#memory:hover,
+#custom-gpu:hover,
+#disk:hover {
+    background: rgba(133, 146, 137, 0.2);
+    border-radius: 14px;
+    transition: all 0.2s ease;
+}

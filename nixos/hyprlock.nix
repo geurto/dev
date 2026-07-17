@@ -1,0 +1,73 @@
+{
+  isLaptop ? false,
+  ...
+}:
+
+{
+  programs.hyprlock = {
+    enable = true;
+    extraConfig = ''
+      source = $HOME/.config/hypr/colors/colors.conf
+
+      $accent = $primary
+      $accentAlpha = $primary
+      $font = JetBrainsMono Nerd Font
+
+      general {
+        hide_cursor = true
+      }
+
+      background {
+        monitor =
+        path = $HOME/.config/background
+        blur_passes = 1
+        color = $red
+        brightness = 0.41272
+      }
+
+      label {
+        monitor =
+        text = $TIME
+        color = $primary
+        font_size = 90
+        font_family = $font
+        position = 0, 130
+        halign = center
+        valign = center
+      }
+
+      label {
+        monitor =
+        text = cmd[update:43200000] date +"%A, %d %B %Y"
+        color = $text
+        font_size = 25
+        font_family = $font
+        position = 0, 50
+        halign = center
+        valign = center
+      }
+
+      input-field {
+        monitor =
+        size = 300, 60
+        outline_thickness = 4
+        dots_size = 0.2
+        dots_spacing = 0.2
+        dots_center = true
+        outer_color = $outline
+        inner_color = $background
+        font_color = $on_background
+        fade_on_empty = true
+        placeholder_text = Password
+        hide_input = false
+        check_color = $primary
+        fail_color = $error
+        fail_text = $ATTEMPTS
+        capslock_color = $yellow
+        position = 0, -47
+        halign = center
+        valign = center
+      }
+    '';
+  };
+}
