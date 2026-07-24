@@ -109,6 +109,36 @@ docker run -it --privileged --net host \
   <DOCKER_IMAGE> bash
 ```
 
+Some useful aliases:
+```bash
+dev='docker exec -it <DEV_CONTAINER_NAME> bash'
+devc='docker run --user 1000:1000 -v ~/.nix-profile/bin/nvim:/usr/bin/nvim -v /nix/store:/nix/store -v $PWD:/workspace --rm --privileged -it'
+devdown='docker compose -f <REPO_ROOT>/.nvim/dev/docker-compose.yml down -t 1'
+devup='export UID=1000 && export GID=1000 && docker compose -f <REPO_ROOT>/.nvim/dev/docker-compose.yml up -d'
+```
+
+Where an example `docker-compose.yml` file looks like:
+```yaml
+services:
+  dev:
+    image: <DEV_IMAGE_NAME> 
+    container_name: dev
+    network_mode: host
+    privileged: true
+    tty: true
+    user: "${UID}:${GID}"
+    volumes:
+    - /tmp/.X11-unix:/tmp/.X11-unix
+    - /dev:/dev
+    - ~/.nix-profile/bin/nvim:/usr/bin/nvim
+    - /nix/store:/nix/store
+    - <REPO_ROOT>:/workspace
+    environment:
+    - TERM=xterm-256color
+    command:
+    - sleep
+    - infinity
+```
 ---
 
 ## Terminal tools
