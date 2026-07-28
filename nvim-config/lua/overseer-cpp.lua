@@ -201,6 +201,38 @@ local function detect_multiarch()
 	return arch
 end
 
+--- Capture env vars after sourcing build_setup.sh, so the debug adapter
+--- sees the same LD_LIBRARY_PATH/AMENT_PREFIX_PATH the build used.
+---@param root string
+---@return table<string,string>
+local function docker_run_env(root)
+	local setup_file = root .. "/.nvim/dev/build_setup.sh"
+	local base_env = docker_build_env()
+	local arch = detect_multiarch()
+
+	local script
+	if vim.fn.filereadable(setup_file) == 1 then
+		script = string.format('source "%s" >/dev/null 2>&1; env', setup_file)
+	else
+		script = string.format('export LD_LIBRARY_PATH="/usr/lib/%s"; env', arch)
+	end
+
+	local result = vim.system({ "/bin/bash", "-c", script }, { env = base_env, text = true }):wait()
+	if result.code ~= 0 then
+		vim.notify("Failed to capture run environment; falling back to build env.", vim.log.levels.WARN)
+		return base_env
+	end
+
+	local env = vim.deepcopy(base_env)
+	for line in result.stdout:gmatch("[^\r\n]+") do
+		local k, v = line:match("^([%w_]+)=(.*)$")
+		if k then
+			env[k] = v
+		end
+	end
+	return env
+end
+
 --- Generate shell export lines for library paths.
 --- Called inside the build script so only cmake/make/gcc see these —
 --- the parent shell/dynamic linker is unaffected.
@@ -318,9 +350,24 @@ local function find_executables(root)
 	return exes
 end
 
+--- Convert a flat env table into cppdbg's {name, value} array format.
+---@param env table<string,string>|nil
+---@return table[]|nil
+local function to_cppdbg_environment(env)
+	if not env then
+		return nil
+	end
+	local list = {}
+	for k, v in pairs(env) do
+		table.insert(list, { name = k, value = v })
+	end
+	return list
+end
+
 --- Prompt the user to pick an executable and launch nvim-dap.
 ---@param root string
-local function pick_and_debug(root)
+---@param run_env table<string,string>|nil
+local function pick_and_debug(root, run_env)
 	local exes = find_executables(root)
 	if #exes == 0 then
 		vim.notify("No executables found in .nvim/clangd/", vim.log.levels.WARN)
@@ -353,7 +400,7 @@ local function pick_and_debug(root)
 			return
 		end
 
-		dap.run({
+		local config = {
 			name = "Debug: " .. vim.fn.fnamemodify(choice, ":t"),
 			type = adapter_name,
 			request = "launch",
@@ -361,7 +408,18 @@ local function pick_and_debug(root)
 			cwd = root,
 			stopOnEntry = false,
 			args = {},
-		})
+			setupCommands = {
+				{ text = "-enable-pretty-printing", description = "enable pretty printing", ignoreFailures = false },
+			},
+		}
+
+		if adapter_name == "cppdbg" then
+			config.environment = to_cppdbg_environment(run_env)
+		else
+			config.env = run_env
+		end
+
+		dap.run(config)
 	end)
 end
 
@@ -423,7 +481,8 @@ local function run_debug()
 	run_build({
 		on_complete = function()
 			vim.schedule(function()
-				pick_and_debug(root)
+				local run_env = is_in_docker() and docker_run_env(root) or nil
+				pick_and_debug(root, run_env)
 			end)
 		end,
 	})
