@@ -188,15 +188,14 @@
     # Firefox
     firefox
 
-    # GIMP
+    # Visual tools
     gimp3
-
-    # Processing
     processing
 
     # MIDI / audio tools
     alsa-utils
     jack2
+    elektroid
 
     # File manager
     nautilus
@@ -204,10 +203,11 @@
     # Torrent
     qbittorrent
 
-    # Claude Code
-    claude-code
+    # Development tools
+    esphome
 
-    # Antigravity
+    # AI agents
+    claude-code
     antigravity
 
     # Proton tools
