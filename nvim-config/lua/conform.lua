@@ -1,7 +1,7 @@
 require("conform").setup({
 	formatters_by_ft = {
 		lua = { "stylua" },
-		python = { "ruff_format", "ruff_organize_imports" },
+		python = { "ruff_fix", "ruff_format" },
 		javascript = { "prettierd", "prettier", stop_after_first = true },
 		nix = { "nixfmt" },
 		rust = {
@@ -36,34 +36,6 @@ require("conform").setup({
 
 				if config_path then
 					return { "format", "--config", config_path, "--stdin-filename", "$FILENAME", "-" }
-				else
-					return base_args
-				end
-			end,
-			stdin = true,
-		},
-		ruff_organize_imports = {
-			command = "ruff",
-			args = function()
-				local config_path = vim.fs.find("pyproject.toml", {
-					upward = true,
-					path = vim.fn.expand("%:p:h"),
-				})[1]
-
-				local base_args = { "check", "--select", "I", "--fix", "--stdin-filename", "$FILENAME", "-" }
-
-				if config_path then
-					return {
-						"check",
-						"--select",
-						"I",
-						"--fix",
-						"--config",
-						config_path,
-						"--stdin-filename",
-						"$FILENAME",
-						"-",
-					}
 				else
 					return base_args
 				end
