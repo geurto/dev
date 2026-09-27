@@ -188,11 +188,16 @@
     # Firefox
     firefox
 
+    # Office suite
+    onlyoffice-desktopeditors
+
     # Visual tools
     gimp3
+    inkscape
     processing
 
     # MIDI / audio tools
+    bitwig-studio5
     alsa-utils
     jack2
     elektroid
