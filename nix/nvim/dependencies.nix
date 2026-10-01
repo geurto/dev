@@ -21,7 +21,10 @@ let
         chmod +x $out/bin/*
       '';
     in
-    [ cpptools vscode-extensions.ms-vscode.cpptools ]
+    [
+      cpptools
+      vscode-extensions.ms-vscode.cpptools
+    ]
   );
 
   packages = [
@@ -53,6 +56,7 @@ let
     nodePackages.typescript
     opensslEnv
     openssh
+    oxlint
     podman-compose
     prettierd
     pyright
@@ -71,7 +75,8 @@ let
     xorg.xhost
     xsel
     zsh
-  ] ++ cpptoolsPackages;
+  ]
+  ++ cpptoolsPackages;
 in
 {
   inherit
