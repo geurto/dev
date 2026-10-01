@@ -52,6 +52,7 @@ with pkgs.vimPlugins;
   nvim-dap-go
   nvim-dap-ui
   nvim-dap-virtual-text
+  nvim-lint
   nvim-lspconfig
   nvim-notify
   nvim-web-devicons

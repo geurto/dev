@@ -24,6 +24,7 @@ let
     "nvim-cmp.lua"
     "nvim-dap-ui.lua"
     "nvim-dap.lua"
+    "nvim-lint.lua"
     "nvim-lspconfig.lua"
     "nvim-notify.lua"
     "nvim-treesitter.lua"

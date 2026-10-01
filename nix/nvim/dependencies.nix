@@ -34,6 +34,7 @@ let
     cargo-nextest
     ccls
     clang-tools
+    deadnix
     curl
     delve
     fzf
@@ -46,7 +47,9 @@ let
     gotools
     isort
     lazygit
+    libxml2
     lldb
+    luaPackages.luacheck
     lua-language-server
     nixfmt-rfc-style
     nodejs
@@ -65,6 +68,7 @@ let
     rust-analyzer
     sshfs
     spdlog
+    statix
     stow
     stylua
     tmux
