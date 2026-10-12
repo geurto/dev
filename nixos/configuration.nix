@@ -161,6 +161,10 @@
     nmap
     wireshark
 
+    # Viewers
+    feh
+    zathura
+
     # Display stuff
     arandr
     brightnessctl
@@ -201,6 +205,12 @@
     alsa-utils
     jack2
     elektroid
+
+    # Steam
+    steam
+
+    # Obsidian
+    obsidian
 
     # File manager
     nautilus
