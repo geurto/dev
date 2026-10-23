@@ -28,12 +28,15 @@ let
   );
 
   packages = [
+    actionlint
     bat
     binutils
     black
     cargo-nextest
     ccls
     clang-tools
+    cmake-lint
+    cppcheck
     deadnix
     curl
     delve
@@ -45,11 +48,13 @@ let
     golangci-lint
     gopls
     gotools
+    hadolint
     isort
     lazygit
     libxml2
     lldb
     luaPackages.luacheck
+    markdownlint-cli2
     lua-language-server
     nixfmt-rfc-style
     nodejs
@@ -64,6 +69,7 @@ let
     prettierd
     pyright
     ripgrep
+    shellcheck
     ruff
     rust-analyzer
     sshfs
@@ -71,13 +77,16 @@ let
     statix
     stow
     stylua
+    taplo
     tmux
     tmuxPlugins.sensible
+    typos
     wget
     xclip
     xdotool
     xorg.xhost
     xsel
+    yamllint
     zsh
   ]
   ++ cpptoolsPackages;

@@ -65,6 +65,7 @@ lspconfig.pyright.setup({
 })
 lspconfig.svelte.setup({ capabilities = capabilities })
 lspconfig.ts_ls.setup({ capabilities = capabilities })
+lspconfig.taplo.setup({ capabilities = capabilities })
 
 vim.fn.sign_define("DapBreakpoint", { text = "", texthl = "DapBreakpoint" })
 vim.fn.sign_define(
