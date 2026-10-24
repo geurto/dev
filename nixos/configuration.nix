@@ -5,6 +5,16 @@
   ...
 }:
 
+let
+  # Separately instantiated so claude-code can track nixos-unstable while the
+  # rest of the system stays on the pinned nixpkgs input. Needs its own
+  # allowUnfree — the main nixpkgs.config.allowUnfree below doesn't apply to
+  # this independently-instantiated legacyPackages.
+  pkgs-unstable = import inputs.nixpkgs-unstable {
+    system = pkgs.system;
+    config.allowUnfree = true;
+  };
+in
 {
   imports = [
     ./greetd.nix
@@ -162,8 +172,9 @@
     wireshark
 
     # Viewers
-    feh
-    zathura
+    feh # images
+    zathura # pdf
+    lite-xl # text
 
     # Display stuff
     arandr
@@ -222,7 +233,7 @@
     esphome
 
     # AI agents
-    claude-code
+    pkgs-unstable.claude-code
     antigravity
 
     # Proton tools
