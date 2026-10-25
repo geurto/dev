@@ -20,6 +20,7 @@ in
         modules-left = [
           "clock"
           "network"
+          "tray"
           "bluetooth"
           "hyprland/window"
         ];
@@ -67,6 +68,11 @@ in
           format-disconnected = "󰖪 off";
           tooltip-format = "{ifname}: {ipaddr}\n↑ {bandwidthUpBits}  ↓ {bandwidthDownBits}";
           on-click = "nm-connection-editor";
+        };
+
+        tray = {
+          icon-size = fontSize + 3;
+          spacing = 8;
         };
 
         bluetooth = {

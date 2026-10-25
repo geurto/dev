@@ -1,6 +1,5 @@
 {
   pkgs,
-  lib,
   isLaptop ? false,
   ...
 }:
@@ -60,8 +59,7 @@ in
         "hyprpaper"
         "waybar"
         "wlsunset -l 51.9 -L 4.4 -t 2800 -T 6500"
-      ]
-      ++ lib.optionals isLaptop [ "blueman-applet" ];
+      ];
 
       exec = [
         "gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'"

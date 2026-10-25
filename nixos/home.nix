@@ -18,6 +18,33 @@ let
   # 1440p desktop monitor where the defaults were originally calibrated.
   fontSize = if isLaptop then 11 else 13;
   cursorSize = if isLaptop then 20 else 24;
+
+  # Papirus-Dark with its panel/status icons (nm-applet etc.) recolored to
+  # the Everforest palette used by waybar.
+  papirusEverforest = pkgs.runCommand "papirus-everforest" { } ''
+    icons=$out/share/icons
+    mkdir -p $icons
+    # Papirus-Dark symlinks most contexts into ../../Papirus, so ship both
+    cp -a ${pkgs.papirus-icon-theme}/share/icons/Papirus $icons/Papirus
+    cp -a ${pkgs.papirus-icon-theme}/share/icons/Papirus-Dark $icons/Papirus-Everforest
+    chmod -R u+w $out
+    cd $icons/Papirus-Everforest
+    sed -i 's/^Name=.*/Name=Papirus-Everforest/' index.theme
+    for d in */panel */status */symbolic; do
+      if [ -L "$d" ]; then
+        target=$(readlink -f "$d")
+        rm "$d"
+        cp -rL "$target" "$d"
+        chmod -R u+w "$d"
+      fi
+      find "$d" -type f -name '*.svg' -exec sed -i \
+        -e 's/ColorScheme-Text { color:#[0-9a-fA-F]*/ColorScheme-Text { color:#7fbbb3/' \
+        -e 's/ColorScheme-NegativeText { color:#[0-9a-fA-F]*/ColorScheme-NegativeText { color:#e67e80/' \
+        -e 's/ColorScheme-NeutralText { color:#[0-9a-fA-F]*/ColorScheme-NeutralText { color:#e69875/' \
+        -e 's/ColorScheme-PositiveText { color:#[0-9a-fA-F]*/ColorScheme-PositiveText { color:#a7c080/' \
+        {} +
+    done
+  '';
 in
 {
   imports = [
@@ -134,6 +161,15 @@ in
       AddKeysToAgent = "yes";
       ServerAliveInterval = 60;
       ServerAliveCountMax = 3;
+    };
+  };
+
+  # ── Icons ─────────────────────────────────────────────────────────────────
+  gtk = {
+    enable = true;
+    iconTheme = {
+      package = papirusEverforest;
+      name = "Papirus-Everforest";
     };
   };
 
