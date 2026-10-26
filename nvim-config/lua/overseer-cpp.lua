@@ -8,6 +8,7 @@
 --   <repo-root>/
 --     .nvim/clangd/                -- out-of-source build dir (created automatically)
 --     .nvim/dev/build_setup.sh      -- optional: extra env setup (e.g. source ROS2)
+--     .nvim/dev/colcon_build.sh     -- optional: colcon build hook (see below)
 --     pkg_a/CMakeLists.txt
 --     pkg_b/CMakeLists.txt
 --     ...
@@ -17,6 +18,14 @@
 --   :OverseerRun cpp_debug          -- build then launch nvim-dap on chosen executable
 --   :OverseerRun cpp_clean          -- wipe the build directory
 --   :OverseerRun cpp_configure      -- cmake configure only (no build)
+--
+-- Colcon repos:
+--   If the repo provides .nvim/dev/colcon_build.sh, builds are delegated to it
+--   instead of plain cmake. The script takes ROS package names as arguments
+--   (none = build all), builds an overlay workspace in .nvim/colcon/ with
+--   persistent build dirs, and merges the per-package compile databases into
+--   .nvim/colcon/compile_commands.json. Executables are taken from
+--   .nvim/colcon/install/, and the overlay is sourced for debug sessions.
 --
 -- Install:
 --   Drop this file in  ~/.config/nvim/lua/overseer/template/  (or wherever
@@ -65,6 +74,49 @@ local function discover_packages(root)
 	table.sort(pkgs, function(a, b)
 		return a.name < b.name
 	end)
+	return pkgs
+end
+
+--- Path to the repo's colcon build hook, if it provides one.
+---@param root string
+---@return string|nil
+local function colcon_script(root)
+	local s = root .. "/.nvim/dev/colcon_build.sh"
+	return vim.fn.filereadable(s) == 1 and s or nil
+end
+
+--- A ROS package's name lives in package.xml, not the directory name.
+---@param pkg_path string
+---@return string|nil
+local function ros_pkg_name(pkg_path)
+	local xml = pkg_path .. "/package.xml"
+	if vim.fn.filereadable(xml) == 0 then
+		return nil
+	end
+	for _, line in ipairs(vim.fn.readfile(xml)) do
+		local n = line:match("<name>%s*(.-)%s*</name>")
+		if n then
+			return n
+		end
+	end
+end
+
+--- Discover colcon packages: CMake packages that have a package.xml,
+--- named by their ROS package name, plus an entry that builds everything.
+---@param root string
+---@return table[]
+local function discover_colcon_packages(root)
+	local pkgs = {}
+	for _, pkg in ipairs(discover_packages(root)) do
+		local name = ros_pkg_name(pkg.path)
+		if name then
+			table.insert(pkgs, { name = name, path = pkg.path })
+		end
+	end
+	table.sort(pkgs, function(a, b)
+		return a.name < b.name
+	end)
+	table.insert(pkgs, 1, { name = "(all packages)", path = root, all = true })
 	return pkgs
 end
 
@@ -212,10 +264,17 @@ local function docker_run_env(root)
 
 	local script
 	if vim.fn.filereadable(setup_file) == 1 then
-		script = string.format('source "%s" >/dev/null 2>&1; env', setup_file)
+		script = string.format('source "%s" >/dev/null 2>&1; ', setup_file)
 	else
-		script = string.format('export LD_LIBRARY_PATH="/usr/lib/%s"; env', arch)
+		script = string.format('export LD_LIBRARY_PATH="/usr/lib/%s"; ', arch)
 	end
+	-- Source the colcon overlay so the debuggee loads freshly built libraries
+	-- instead of the stale copies in the underlay.
+	local overlay = root .. "/.nvim/colcon/install/local_setup.bash"
+	if vim.fn.filereadable(overlay) == 1 then
+		script = script .. string.format('source "%s" >/dev/null 2>&1; ', overlay)
+	end
+	script = script .. "env"
 
 	local result = vim.system({ "/bin/bash", "-c", script }, { env = base_env, text = true }):wait()
 	if result.code ~= 0 then
@@ -329,24 +388,74 @@ echo "=== Build finished successfully ==="]],
 	)
 end
 
---- Find executables produced by the CMake build.
+--- Build the shell command that runs the repo's colcon hook.
+---@param root string    repo root
+---@param script string  path to colcon_build.sh
+---@param pkg table      picked package (pkg.all = build everything)
+---@param in_docker boolean whether we're in a container
+---@return string
+local function colcon_build_cmd(root, script, pkg, in_docker)
+	local pkg_arg = pkg.all and "" or (" " .. vim.fn.shellescape(pkg.name))
+	-- clangd reads its database from .nvim/clangd (see nvim-lspconfig.lua),
+	-- so point that at the merged colcon database.
+	local clangd_dir = root .. "/.nvim/clangd"
+	return string.format(
+		[[set -euo pipefail
+%s
+bash %s%s
+mkdir -p %s
+ln -sf %s %s
+echo "=== Build finished successfully ==="]],
+		in_docker and lib_path_exports() or "",
+		vim.fn.shellescape(script),
+		pkg_arg,
+		vim.fn.shellescape(clangd_dir),
+		vim.fn.shellescape(root .. "/.nvim/colcon/compile_commands.json"),
+		vim.fn.shellescape(clangd_dir .. "/compile_commands.json")
+	)
+end
+
+--- Whether `path` is an ELF binary (filters out wrapper scripts).
+---@param path string
+---@return boolean
+local function is_elf(path)
+	local f = io.open(path, "rb")
+	if not f then
+		return false
+	end
+	local magic = f:read(4)
+	f:close()
+	return magic == "\127ELF"
+end
+
+--- Find executables produced by the build.
+--- Colcon installs them to install/<pkg>/lib/<pkg>/; with --symlink-install
+--- those are symlinks, hence `find -L`.
 ---@param root string
 ---@return string[]
 local function find_executables(root)
-	local build_dir = root .. "/.nvim/clangd"
+	local search
+	if colcon_script(root) then
+		search = "-L "
+			.. vim.fn.shellescape(root .. "/.nvim/colcon/install")
+			.. " -mindepth 4 -maxdepth 4 -path '*/lib/*'"
+	else
+		search = vim.fn.shellescape(root .. "/.nvim/clangd") .. " -maxdepth 3"
+	end
 	local cmd = string.format(
-		"find %s -maxdepth 3 -type f -executable -not -name '*.so' -not -name '*.a' "
+		"find %s -type f -executable -not -name '*.so' -not -name '*.so.*' -not -name '*.a' "
 			.. "-not -name 'CMake*' -not -name '*.cmake' -not -name 'Makefile' "
 			.. "-not -name '*.sh' -not -name '*.py' 2>/dev/null",
-		vim.fn.shellescape(build_dir)
+		search
 	)
 	local output = vim.fn.systemlist(cmd)
 	local exes = {}
 	for _, line in ipairs(output) do
-		if line ~= "" then
+		if line ~= "" and is_elf(line) then
 			table.insert(exes, line)
 		end
 	end
+	table.sort(exes)
 	return exes
 end
 
@@ -370,7 +479,8 @@ end
 local function pick_and_debug(root, run_env)
 	local exes = find_executables(root)
 	if #exes == 0 then
-		vim.notify("No executables found in .nvim/clangd/", vim.log.levels.WARN)
+		local dir = colcon_script(root) and ".nvim/colcon/install/" or ".nvim/clangd/"
+		vim.notify("No executables found in " .. dir, vim.log.levels.WARN)
 		return
 	end
 
@@ -436,10 +546,12 @@ local function run_build(opts)
 	end
 
 	local in_docker = is_in_docker()
-	local pkgs = discover_packages(root)
+	local script = colcon_script(root)
+	local pkgs = script and discover_colcon_packages(root) or discover_packages(root)
 
 	pick_package(pkgs, function(pkg)
-		local cmd = cmake_build_cmd(root, pkg.path, in_docker)
+		local cmd = script and colcon_build_cmd(root, script, pkg, in_docker)
+			or cmake_build_cmd(root, pkg.path, in_docker)
 		local env = nil
 		if in_docker then
 			env = docker_build_env()
@@ -481,7 +593,10 @@ local function run_debug()
 	run_build({
 		on_complete = function()
 			vim.schedule(function()
-				local run_env = is_in_docker() and docker_run_env(root) or nil
+				-- Colcon builds need the overlay sourced even outside Docker,
+				-- since ament packages find each other via LD_LIBRARY_PATH.
+				local needs_env = is_in_docker() or colcon_script(root) ~= nil
+				local run_env = needs_env and docker_run_env(root) or nil
 				pick_and_debug(root, run_env)
 			end)
 		end,
@@ -495,7 +610,7 @@ local function run_clean()
 		return
 	end
 
-	local build_dir = root .. "/.nvim/clangd"
+	local build_dir = root .. (colcon_script(root) and "/.nvim/colcon" or "/.nvim/clangd")
 	local task = overseer.new_task({
 		name = "Clean build",
 		cmd = "/bin/bash",
@@ -513,6 +628,11 @@ local function run_configure()
 	local root = find_root()
 	if not root then
 		vim.notify("Cannot find project root.", vim.log.levels.ERROR)
+		return
+	end
+
+	if colcon_script(root) then
+		vim.notify("colcon configures incrementally; use cpp_build instead.", vim.log.levels.INFO)
 		return
 	end
 
@@ -590,7 +710,7 @@ for _, tmpl in ipairs({
 	},
 	{
 		name = "cpp_clean",
-		desc = "Remove the .nvim/clangd directory",
+		desc = "Remove the build directory (.nvim/clangd or .nvim/colcon)",
 		run = run_clean,
 	},
 	{
@@ -622,4 +742,4 @@ vim.keymap.set("n", "<leader>c", "<nop>", { desc = "cpp" })
 vim.keymap.set("n", "<leader>cb", run_build, { desc = "Build CMake package (overseer)" })
 vim.keymap.set("n", "<leader>cd", run_debug, { desc = "Build + debug C++ (overseer + dap)" })
 vim.keymap.set("n", "<leader>cc", run_configure, { desc = "CMake configure only" })
-vim.keymap.set("n", "<leader>cx", run_clean, { desc = "Clean .nvim/clangd" })
+vim.keymap.set("n", "<leader>cx", run_clean, { desc = "Clean build directory" })
