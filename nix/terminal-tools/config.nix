@@ -133,6 +133,10 @@
     set -as terminal-overrides ',*:Tc'
     set -as terminal-features ',*:RGB'
 
+    # Let applications (e.g. nvim in a container) set the system clipboard via OSC 52
+    set -g set-clipboard on
+    set -as terminal-features ',*:clipboard'
+
     # Status bar
     set -g status-style bg=black,fg=white
     set -g window-status-current-style bg=white,fg=black,bold

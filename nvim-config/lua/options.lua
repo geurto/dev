@@ -11,6 +11,23 @@ vim.opt.showmode = false
 vim.opt.hlsearch = true
 vim.opt.timeoutlen = 100
 vim.opt.clipboard = "unnamedplus"
+
+-- Inside a container there's no usable X/Wayland clipboard, so copy via
+-- OSC 52 escape sequences, which the host terminal turns into a clipboard
+-- write. Paste reads the local register instead of an OSC 52 query, since
+-- alacritty doesn't answer those (paste from the host with Ctrl+Shift+V).
+local in_container = vim.uv.fs_stat("/.dockerenv") or vim.uv.fs_stat("/run/.containerenv")
+if in_container then
+	local osc52 = require("vim.ui.clipboard.osc52")
+	local function paste()
+		return { vim.fn.split(vim.fn.getreg(""), "\n"), vim.fn.getregtype("") }
+	end
+	vim.g.clipboard = {
+		name = "OSC 52",
+		copy = { ["+"] = osc52.copy("+"), ["*"] = osc52.copy("*") },
+		paste = { ["+"] = paste, ["*"] = paste },
+	}
+end
 vim.opt.diffopt:append("vertical")
 vim.opt.shell = "zsh"
 
