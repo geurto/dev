@@ -234,6 +234,13 @@ local function docker_build_env()
 	env.NIX_CC_WRAPPER_TARGET_HOST = ""
 	env.NIX_BINTOOLS_WRAPPER_TARGET_HOST = ""
 
+	-- The nvim Nix wrapper exports CMake package hints pointing into /nix/store.
+	-- In a container these make find_package() pick Nix's fmt/spdlog/OpenSSL
+	-- instead of the distro's, causing "DSO missing from command line" errors.
+	env.fmt_DIR = ""
+	env.spdlog_DIR = ""
+	env.OPENSSL_ROOT_DIR = ""
+
 	return env
 end
 
@@ -320,6 +327,8 @@ export LIBRARY_PATH="/usr/lib/%s"
 # Unset Nix compiler wrapper variables in case they leaked through
 unset NIX_CFLAGS_COMPILE NIX_LDFLAGS NIX_CC_WRAPPER_TARGET_HOST NIX_BINTOOLS_WRAPPER_TARGET_HOST 2>/dev/null || true
 unset C_INCLUDE_PATH CPLUS_INCLUDE_PATH 2>/dev/null || true
+# Nix-wrapper CMake hints must not override the container's system packages.
+unset fmt_DIR spdlog_DIR OPENSSL_ROOT_DIR 2>/dev/null || true
 ]],
 		arch,
 		arch
