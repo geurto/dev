@@ -63,6 +63,13 @@
         timeout = 600;
         on-timeout = "hyprlock";
       }
+      # Tells claude-idle-suspend (claude-remote.nix) that peter is away, so
+      # the desk no longer blocks suspend. hypridle itself never suspends here.
+      {
+        timeout = 900;
+        on-timeout = "touch /run/claude-activity/desk-away";
+        on-resume = "rm -f /run/claude-activity/desk-away";
+      }
     ];
   };
 

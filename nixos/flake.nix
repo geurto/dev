@@ -59,6 +59,7 @@
       nixosConfigurations."nixos-pc" = mkSystem { isLaptop = false; } [
         ./hardware-configuration-pc.nix # PC hardware (committed to repo)
         ./pc-extras.nix # WoL, hostname
+        ./claude-remote.nix # Claude Code Remote Control + idle suspend
       ];
 
       # ── Laptop ───────────────────────────────────────────────────────────
