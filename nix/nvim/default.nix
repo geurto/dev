@@ -12,9 +12,9 @@ let
 
     "alpha.lua"
     "everforest.lua"
+    "bufferline.lua"
     "conform.lua"
     "gitsigns.lua"
-    "harpoon.lua"
     "lazygit.lua"
     "lualine.lua"
     "markview.lua"

@@ -56,7 +56,7 @@ The flake (`flake.nix`) defines:
 
 Three files in `nix/nvim/`:
 - **`default.nix`**: Builds the neovim shell wrapper. Injects runtime dependencies as environment variables (`OPENSSL_ROOT_DIR`, `spdlog_DIR`, `fmt_DIR`) and copies `nvim-config/` into the Nix store.
-- **`plugins.nix`**: ~68 plugins pinned via `flake.lock`. Includes treesitter, nvim-cmp, nvim-lspconfig, nvim-dap, nvim-dap-ui, conform, telescope, harpoon (custom-built from harpoon2 branch), overseer, and more.
+- **`plugins.nix`**: ~68 plugins pinned via `flake.lock`. Includes treesitter, nvim-cmp, nvim-lspconfig, nvim-dap, nvim-dap-ui, conform, telescope, bufferline, overseer, and more.
 - **`dependencies.nix`**: 31+ runtime packages including clangd, rust-analyzer, gopls, pyright, ts_ls, svelte LSP, gdb, lldb, delve, vscode-cpptools (x86_64 only), black, isort, ruff, stylua, prettierd, nixfmt-rfc-style, podman-compose, ripgrep, openssh, sshfs, xclip, xdotool.
 
 ### Terminal Tools Configuration
