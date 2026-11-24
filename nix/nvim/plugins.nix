@@ -14,6 +14,7 @@ with pkgs.vimPlugins;
     ]
   ))
   alpha-nvim
+  bufferline-nvim
   everforest
   cmp-buffer
   cmp-cmdline
@@ -22,22 +23,6 @@ with pkgs.vimPlugins;
   cmp_luasnip
   conform-nvim
   gitsigns-nvim
-  (pkgs.vimUtils.buildVimPlugin {
-    pname = "harpoon";
-    version = "harpoon2";
-    src = pkgs.fetchFromGitHub {
-      owner = "ThePrimeagen";
-      repo = "harpoon";
-      rev = "harpoon2";
-      sha256 = "sha256-qQSPVMdldksNZDPZvnTiXxty+GSUqMGz8nYEFDRezrQ=";
-    };
-    nvimSkipModule = [
-      "harpoon.data"
-      "harpoon.scratch.toggle"
-      "harpoon.config"
-      "harpoon"
-    ];
-  })
   lazygit-nvim
   lsp_lines-nvim
   lualine-nvim
