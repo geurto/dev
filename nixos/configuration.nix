@@ -231,6 +231,7 @@ in
 
     # Development tools
     esphome
+    gh
 
     # AI agents
     pkgs-unstable.claude-code
